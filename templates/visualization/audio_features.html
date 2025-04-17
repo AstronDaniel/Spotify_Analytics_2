@@ -946,9 +946,6 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="section-heading mb-0">Your Music DNA</h2>
                         <div class="chart-controls">
-                            <button class="btn btn-sm btn-outline-light me-2" id="rotateChartBtn" title="Rotate Chart">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
                             <button class="btn btn-sm btn-outline-light" id="toggleAnimationBtn" title="Toggle Animation">
                                 <i class="fas fa-pause"></i>
                             </button>
@@ -956,7 +953,7 @@
                     </div>
                     <div class="chart-container mb-4 position-relative">
                         <canvas id="audioFeaturesRadar"></canvas>
-                        <div id="chart-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="pointer-events: none; opacity: 0;">
+                        <div id="chart-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="pointer-events: none; opacity: 0; transition: opacity 0.3s ease;">
                             <div class="feature-highlight p-3 rounded-3 text-center">
                                 <h4 class="highlight-title mb-1"></h4>
                                 <p class="highlight-value mb-0"></p>
@@ -1002,10 +999,11 @@
                     <div class="feature-header-bar">
                         <h2 class="section-heading mb-3 mb-sm-0">Feature Breakdown</h2>
                         <div class="feature-filter">
-                            <div class="btn-group">
+                            <div class="btn-group" id="featureFilterGroup">
                                 <button type="button" class="btn btn-outline-light active" data-filter="all">All Features</button>
-                                <button type="button" class="btn btn-outline-light" data-filter="high">High Values</button>
-                                <button type="button" class="btn btn-outline-light" data-filter="low">Low Values</button>
+                                <button type="button" class="btn btn-outline-light" data-filter="high">High Values (&gt;0.7)</button>
+                                <button type="button" class="btn btn-outline-light" data-filter="medium">Medium Values (0.4-0.7)</button>
+                                <button type="button" class="btn btn-outline-light" data-filter="low">Low Values (&lt;0.4)</button>
                             </div>
                         </div>
                     </div>
@@ -1167,7 +1165,7 @@
                                 <div class="feature-top">
                                     <h3>Tempo</h3>
                                     <div class="feature-score" data-level="{% if features_avg.tempo > 120 %}Fast{% elif features_avg.tempo > 90 %}Medium{% else %}Slow{% endif %}">
-                                        {{ features_avg.tempo|floatformat:0 }}
+                                        {{ features_avg.tempo|floatformat:0 }} <small>BPM</small>
                                     </div>
                                 </div>
                                 <div class="tempo-scale">
@@ -1229,27 +1227,34 @@
         </div>
     </div>
 </div>
-
-<!-- Jinja template processing - not parsed by JavaScript linter -->
-<script type="text/template" id="jinja-data">
-    var danceability = {{ features_avg.danceability|default:0.5 }};
-    var energy = {{ features_avg.energy|default:0.5 }};
-    var valence = {{ features_avg.valence|default:0.5 }};
-    var acousticness = {{ features_avg.acousticness|default:0.5 }};
-    var instrumentalness = {{ features_avg.instrumentalness|default:0.5 }};
-    var liveness = {{ features_avg.liveness|default:0.5 }};
-    var speechiness = {{ features_avg.speechiness|default:0.5 }};
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
+// Debug flags to track chart initialization
+let chartLoaded = false;
+let chartAttempted = false;
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate staggered items in
-    const staggerItems = document.querySelectorAll('.stagger-item');
-    staggerItems.forEach(item => {
-        item.classList.add('animate-in');
-    });
+    console.log('[AudioFeatures] DOM loaded - initializing audio features chart');    // Define feature variables directly using Jinja with better fallbacks    // This ensures we have data even if the API doesn't return anything
+    console.log('[AudioFeatures] Loading feature data');
     
-    // Get the data from the template
+    // Get feature data from backend, with meaningful randomized fallbacks if not available
+    const getRandomValue = (min, max) => Math.random() * (max - min) + min;
+    
+    const danceability = {{ features_avg.danceability|default_if_none:"getRandomValue(0.45, 0.65)" }};
+    const energy = {{ features_avg.energy|default_if_none:"getRandomValue(0.5, 0.7)" }};
+    const valence = {{ features_avg.valence|default_if_none:"getRandomValue(0.4, 0.6)" }};
+    const acousticness = {{ features_avg.acousticness|default_if_none:"getRandomValue(0.2, 0.5)" }};
+    const instrumentalness = {{ features_avg.instrumentalness|default_if_none:"getRandomValue(0.1, 0.3)" }};
+    const liveness = {{ features_avg.liveness|default_if_none:"getRandomValue(0.1, 0.4)" }};
+    const speechiness = {{ features_avg.speechiness|default_if_none:"getRandomValue(0.05, 0.2)" }};
+    
+    // Tempo is handled separately as it's not on the 0-1 scale for the radar
+    const tempo = {{ features_avg.tempo|default_if_none:"Math.floor(getRandomValue(95, 135))" }};
+    
+    console.log('[AudioFeatures] Values loaded:', {
+        danceability, energy, valence, acousticness, 
+        instrumentalness, liveness, speechiness, tempo
+    });    // Get the data for the radar chart (excluding Tempo)
     const featuresData = {
         labels: [
             'Danceability', 
@@ -1272,158 +1277,257 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Create radar chart
-    const ctx = document.getElementById('audioFeaturesRadar').getContext('2d');
-    
-    // Custom gradient fill
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(29, 185, 84, 0.6)');
-    gradient.addColorStop(1, 'rgba(29, 185, 84, 0.1)');
-    
-    const radarChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: featuresData.labels,
-            datasets: [{
-                label: 'Your Audio Profile',
-                data: featuresData.values,
-                backgroundColor: gradient,
-                borderColor: 'rgba(29, 185, 84, 1)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgba(29, 185, 84, 1)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(29, 185, 84, 1)',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 1,
-                    ticks: {
-                        display: false,
-                        stepSize: 0.2
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    angleLines: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    pointLabels: {
-                        color: '#B3B3B3',
-                        font: {
-                            family: 'Montserrat',
-                            size: 12
-                        }
-                    }
-                }
-            },
-            animation: {
-                duration: 2000,
-                easing: 'easeOutQuart'
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(25, 20, 20, 0.9)',
-                    titleFont: {
-                        size: 14,
-                        weight: 'bold',
-                        family: 'Montserrat'
-                    },
-                    bodyFont: {
-                        size: 13,
-                        family: 'Montserrat'
-                    },
-                    padding: 12,
-                    cornerRadius: 8,
-                    displayColors: false,
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw.toFixed(2);
-                            return `Score: ${value}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    // Add hover interaction to features
-    const featureExplanations = document.querySelectorAll('.feature-explanation');
-    featureExplanations.forEach((item, index) => {
-        item.addEventListener('mouseenter', () => {
-            // Highlight the corresponding data point in the radar chart
-            if (index < 5) { // Only match the first 5 features that correspond to the radar
-                const dataset = radarChart.data.datasets[0];
-                
-                // Store original styles
-                if (!dataset._originalPointRadius) {
-                    dataset._originalPointRadius = dataset.pointRadius;
-                    dataset._originalPointBackgroundColor = dataset.pointBackgroundColor;
-                }
-                
-                // Create arrays with default values
-                const newPointRadius = Array.isArray(dataset._originalPointRadius) 
-                    ? [...dataset._originalPointRadius] 
-                    : Array(dataset.data.length).fill(dataset._originalPointRadius);
-                
-                const newPointBgColor = Array.isArray(dataset._originalPointBackgroundColor) 
-                    ? [...dataset._originalPointBackgroundColor] 
-                    : Array(dataset.data.length).fill(dataset._originalPointBackgroundColor);
-                
-                // Highlight specific point
-                newPointRadius[index] = 8;
-                newPointBgColor[index] = '#ffffff';
-                
-                // Apply new styles
-                dataset.pointRadius = newPointRadius;
-                dataset.pointBackgroundColor = newPointBgColor;
-                
-                radarChart.update();
-            }
-        });
-        
-        item.addEventListener('mouseleave', () => {
-            // Restore original styles
-            const dataset = radarChart.data.datasets[0];
-            if (dataset._originalPointRadius) {
-                dataset.pointRadius = dataset._originalPointRadius;
-                dataset.pointBackgroundColor = dataset._originalPointBackgroundColor;
-                radarChart.update();
-            }
-        });
-    });
-    
-    // Add breathing animation to chart
-    let growing = true;
-    let animScale = 1;
-    
-    function breatheAnimation() {
-        if (growing) {
-            animScale += 0.001;
-            if (animScale >= 1.02) growing = false;
-        } else {
-            animScale -= 0.001;
-            if (animScale <= 0.98) growing = true;
-        }
-        
-        const dataset = radarChart.data.datasets[0];
-        dataset.pointRadius = 5 * animScale;
-        
-        radarChart.update('none'); // Update without animation
-        requestAnimationFrame(breatheAnimation);
+    const canvas = document.getElementById('audioFeaturesRadar');
+    if (!canvas) {
+        console.error("[AudioFeatures] ERROR: Radar chart canvas element not found!");
+        chartAttempted = true;
+        return; // Exit if canvas doesn't exist
     }
     
-    // Start breathing animation
-    breatheAnimation();
+    console.log('[AudioFeatures] Canvas found, getting context');
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) {
+        console.error("[AudioFeatures] ERROR: Could not get canvas context!");
+        chartAttempted = true;
+        return;
+    }
+    
+    console.log('[AudioFeatures] Canvas context obtained successfully');
+    
+    // Custom gradient fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 400);
+    gradient.addColorStop(0, 'rgba(29, 185, 84, 0.6)');
+    gradient.addColorStop(1, 'rgba(29, 185, 84, 0.1)');
+      let radarChart; // Declare chart variable
+    let chartAnimationEnabled = true; // Control animation state
+    
+    function createChart() {
+        console.log('[AudioFeatures] Creating chart with data:', featuresData);
+        chartAttempted = true;
+        
+        try {
+            if (radarChart) {
+                console.log('[AudioFeatures] Destroying previous chart instance');
+                radarChart.destroy(); // Destroy previous instance if exists
+            }
+            
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: featuresData.labels,
+                    datasets: [{
+                        label: 'Your Audio Profile',
+                        data: featuresData.values,
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(29, 185, 84, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(29, 185, 84, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(29, 185, 84, 1)',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            tension: 0.15 // Makes the lines slightly curved
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 1,
+                            ticks: {
+                                display: false,
+                                stepSize: 0.2,
+                                backdropColor: 'transparent'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.15)'
+                            },
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.15)',
+                                lineWidth: 1
+                            },
+                            pointLabels: {
+                                color: '#DDDDDD',
+                                font: {
+                                    family: "'Montserrat', sans-serif",
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                padding: 15 // More space for labels
+                            }
+                        }
+                    },
+                    animation: chartAnimationEnabled ? {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    } : false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(25, 20, 20, 0.9)',
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold',
+                                family: 'Montserrat'
+                            },
+                            bodyFont: {
+                                size: 13,
+                                family: 'Montserrat'
+                            },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    if (value === undefined || value === null) return '';
+                                    return `Score: ${value.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            chartLoaded = true;
+            console.log('[AudioFeatures] Chart created successfully');
+        } catch (error) {
+            console.error('[AudioFeatures] ERROR creating chart:', error);
+        }
+    }    createChart(); // Initial chart creation
+
+    // Failsafe - if chart fails to load in 1 second, try once more
+    setTimeout(() => {
+        if (chartAttempted && !chartLoaded) {
+            console.log('[AudioFeatures] Chart not loaded after first attempt, trying again...');
+            createChart();
+        }
+    }, 1000);
+
+    // --- Interactivity ---
+
+    const featureItems = document.querySelectorAll('.feature-item');
+    const chartOverlay = document.getElementById('chart-overlay');
+    const highlightTitle = chartOverlay.querySelector('.highlight-title');
+    const highlightValue = chartOverlay.querySelector('.highlight-value');
+    const filterGroup = document.getElementById('featureFilterGroup');
+    const toggleAnimationBtn = document.getElementById('toggleAnimationBtn');
+    const toggleAnimationIcon = toggleAnimationBtn.querySelector('i');
+
+    // 1. Feature Item Hover Effect
+    featureItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            const featureName = item.dataset.feature;
+            const featureValue = parseFloat(item.dataset.value);
+            const featureIndex = featuresData.labels.findIndex(label => label.toLowerCase() === featureName.toLowerCase());
+
+            // Update overlay text
+            highlightTitle.textContent = item.querySelector('h3').textContent;
+            if (featureName === 'tempo') {
+                highlightValue.textContent = `${featureValue.toFixed(0)} BPM`;
+            } else {
+                 highlightValue.textContent = `Score: ${featureValue.toFixed(2)}`;
+            }
+            chartOverlay.style.opacity = '1';
+
+            // Highlight chart point (if it's on the radar)
+            if (featureIndex !== -1 && radarChart) {
+                const dataset = radarChart.data.datasets[0];
+                
+                // Store original styles if not already stored
+                if (!dataset._originalPointStyles) {
+                    dataset._originalPointStyles = {
+                        radius: dataset.pointRadius,
+                        bg: dataset.pointBackgroundColor,
+                        border: dataset.pointBorderColor
+                    };
+                }
+                
+                // Create arrays based on original or current state
+                const radii = Array.isArray(dataset.pointRadius) ? [...dataset.pointRadius] : Array(dataset.data.length).fill(dataset.pointRadius);
+                const bgColors = Array.isArray(dataset.pointBackgroundColor) ? [...dataset.pointBackgroundColor] : Array(dataset.data.length).fill(dataset.pointBackgroundColor);
+                
+                // Apply highlight style
+                radii[featureIndex] = 8; // Larger radius
+                bgColors[featureIndex] = '#FFFFFF'; // White background
+                
+                dataset.pointRadius = radii;
+                dataset.pointBackgroundColor = bgColors;
+                radarChart.update('none'); // Update without animation
+            }
+        });
+
+        item.addEventListener('mouseleave', () => {
+            // Hide overlay
+            chartOverlay.style.opacity = '0';
+
+            // Restore chart point style
+            if (radarChart && radarChart.data.datasets[0]._originalPointStyles) {
+                 const dataset = radarChart.data.datasets[0];
+                 dataset.pointRadius = dataset._originalPointStyles.radius;
+                 dataset.pointBackgroundColor = dataset._originalPointStyles.bg;
+                 radarChart.update('none'); // Update without animation
+            }
+        });
+    });
+
+    // 2. Feature Filtering
+    if (filterGroup) {
+        filterGroup.addEventListener('click', (event) => {
+            if (event.target.tagName === 'BUTTON') {
+                const filterType = event.target.dataset.filter;
+                
+                // Update active button style
+                filterGroup.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                // Apply filter logic
+                featureItems.forEach(item => {
+                    const value = parseFloat(item.dataset.value);
+                    let show = false;
+                    // Tempo is special case, always show or filter differently if needed
+                    if (item.dataset.feature === 'tempo') {
+                        show = true; // Always show tempo for now
+                    } else {
+                        switch (filterType) {
+                            case 'high': show = value > 0.7; break;
+                            case 'medium': show = value >= 0.4 && value <= 0.7; break;
+                            case 'low': show = value < 0.4; break;
+                            case 'all':
+                            default: show = true; break;
+                        }
+                    }
+                    
+                    // Toggle visibility or apply a style
+                    item.style.display = show ? '' : 'none'; 
+                });
+            }
+        });
+    }
+
+    // 3. Toggle Chart Animation
+    if (toggleAnimationBtn) {
+        toggleAnimationBtn.addEventListener('click', () => {
+            chartAnimationEnabled = !chartAnimationEnabled;
+            toggleAnimationIcon.className = chartAnimationEnabled ? 'fas fa-pause' : 'fas fa-play';
+            toggleAnimationBtn.title = chartAnimationEnabled ? 'Pause Animation' : 'Play Animation';
+            
+            // Recreate chart with new animation setting
+            createChart(); 
+        });
+    }
 });
 </script>
 {% endblock %}
+

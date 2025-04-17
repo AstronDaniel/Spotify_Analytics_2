@@ -3,6 +3,10 @@
 {% block title %}Genre Distribution - Spotify Analytics{% endblock %}
 
 {% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
 <style>
     .visualization-container {
         position: relative;
@@ -12,7 +16,7 @@
     .page-header {
         position: relative;
         margin-bottom: 3rem;
-        padding: 2.5rem 0;
+        padding: 3rem 0;
         position: relative;
         overflow: hidden;
         border-radius: 20px;
@@ -25,52 +29,65 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(54, 162, 235, 0.15) 100%);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid var(--glass-border);
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(54, 162, 235, 0.1) 50%, rgba(156, 39, 176, 0.1) 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 15s ease infinite;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
         z-index: -1;
     }
     
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
     .page-title {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 800;
         margin-bottom: 1rem;
         background: linear-gradient(90deg, #1DB954, #64D2AD);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         display: inline-block;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
     
     .chart-container {
-        height: 400px;
+        height: 420px;
         position: relative;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
     
     .genre-item {
         display: flex;
         align-items: center;
-        margin-bottom: 1rem;
-        padding: 0.85rem 1rem;
+        margin-bottom: 0.85rem;
+        padding: 0.75rem 1rem;
         border-radius: 12px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     .genre-item:hover {
-        transform: translateX(5px);
-        background: linear-gradient(135deg, rgba(29, 185, 84, 0.08) 0%, rgba(29, 185, 84, 0.01) 100%);
-        border-color: rgba(29, 185, 84, 0.2);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px) scale(1.02);
+        background: rgba(29, 185, 84, 0.1);
+        border-color: rgba(29, 185, 84, 0.3);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
     
     .genre-rank {
-        width: 35px;
-        height: 35px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: linear-gradient(135deg, #1DB954, #1aa34a);
         display: flex;
@@ -78,59 +95,64 @@
         justify-content: center;
         margin-right: 1rem;
         font-weight: 600;
-        box-shadow: 0 3px 10px rgba(29, 185, 84, 0.3);
-        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 6px rgba(29, 185, 84, 0.25);
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     .genre-item:hover .genre-rank {
-        transform: scale(1.1) rotate(5deg);
-        box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
+        transform: scale(1.15) rotate(8deg);
+        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.35);
     }
     
     .genre-name {
         font-weight: 500;
-        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     .genre-item:hover .genre-name {
-        transform: translateX(2px);
+        transform: translateX(4px);
+        color: var(--light);
     }
     
     .genre-count {
         margin-left: auto;
         font-weight: 600;
+        font-size: 0.85rem;
         color: var(--primary);
         background: rgba(29, 185, 84, 0.1);
-        padding: 0.3rem 0.8rem;
+        padding: 0.25rem 0.7rem;
         border-radius: 50px;
-        transition: all 0.3s ease;
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     .genre-item:hover .genre-count {
-        background: rgba(29, 185, 84, 0.2);
-        transform: scale(1.05);
+        background: rgba(29, 185, 84, 0.25);
+        transform: scale(1.08);
+        color: #fff;
     }
     
     .viz-side-menu {
-        background: var(--glass-bg);
-        border-radius: 16px;
+        background: rgba(25, 20, 20, 0.7);
+        border-radius: 12px;
         padding: 1.5rem;
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: var(--glass-shadow);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     .viz-card {
-        background: var(--glass-bg);
-        border-radius: 16px;
+        background: rgba(25, 20, 20, 0.7);
+        border-radius: 12px;
         padding: 1.75rem;
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: var(--glass-shadow);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         height: 100%;
         position: relative;
         overflow: hidden;
@@ -143,7 +165,7 @@
         left: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.025) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.035) 0%, transparent 60%);
         z-index: 0;
     }
     
@@ -153,15 +175,16 @@
     }
     
     .viz-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        border-color: rgba(29, 185, 84, 0.2);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        border-color: rgba(29, 185, 84, 0.25);
     }
     
     .section-heading {
         position: relative;
         margin-bottom: 1.5rem;
         font-weight: 700;
+        font-size: 1.4rem;
         display: inline-block;
     }
     
@@ -171,10 +194,10 @@
         bottom: -5px;
         left: 0;
         width: 40px;
-        height: 3px;
+        height: 2.5px;
         background: linear-gradient(90deg, #1DB954, #1aa34a);
         border-radius: 10px;
-        transition: width 0.3s ease;
+        transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
     .section-heading:hover::after {
@@ -186,6 +209,7 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 700;
+        padding: 0 2px;
     }
     
     .stagger-item {
@@ -193,14 +217,14 @@
     }
     
     .animate-in {
-        animation: fadeInUp 0.6s ease forwards;
+        animation: fadeInUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         opacity: 0;
     }
     
     @keyframes fadeInUp {
         from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(25px);
         }
         to {
             opacity: 1;
@@ -208,9 +232,7 @@
         }
     }
 </style>
-{% endblock %}
 
-{% block content %}
 <div class="visualization-container">
     <div class="page-header animate-in">
         <div class="container">
@@ -341,52 +363,52 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Define gradient colors
     const createGradient = (ctx, colorStart, colorEnd) => {
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height || 400); // Use canvas height
         gradient.addColorStop(0, colorStart);
         gradient.addColorStop(1, colorEnd);
         return gradient;
     };
     
-    // Create an array of gradients
+    // Create an array of gradients (Refined colors)
     const gradients = [
-        createGradient(ctx, 'rgba(29, 185, 84, 0.8)', 'rgba(29, 185, 84, 0.3)'),
-        createGradient(ctx, 'rgba(255, 99, 132, 0.8)', 'rgba(255, 99, 132, 0.3)'),
-        createGradient(ctx, 'rgba(54, 162, 235, 0.8)', 'rgba(54, 162, 235, 0.3)'),
-        createGradient(ctx, 'rgba(255, 206, 86, 0.8)', 'rgba(255, 206, 86, 0.3)'),
-        createGradient(ctx, 'rgba(153, 102, 255, 0.8)', 'rgba(153, 102, 255, 0.3)'),
-        createGradient(ctx, 'rgba(255, 159, 64, 0.8)', 'rgba(255, 159, 64, 0.3)'),
-        createGradient(ctx, 'rgba(75, 192, 192, 0.8)', 'rgba(75, 192, 192, 0.3)'),
-        createGradient(ctx, 'rgba(255, 99, 255, 0.8)', 'rgba(255, 99, 255, 0.3)'),
-        createGradient(ctx, 'rgba(99, 255, 132, 0.8)', 'rgba(99, 255, 132, 0.3)'),
-        createGradient(ctx, 'rgba(128, 128, 128, 0.8)', 'rgba(128, 128, 128, 0.3)')
+        createGradient(ctx, 'rgba(29, 185, 84, 0.9)', 'rgba(29, 185, 84, 0.4)'), // Spotify Green
+        createGradient(ctx, 'rgba(74, 144, 226, 0.9)', 'rgba(74, 144, 226, 0.4)'), // Blue
+        createGradient(ctx, 'rgba(255, 130, 0, 0.9)', 'rgba(255, 130, 0, 0.4)'), // Orange
+        createGradient(ctx, 'rgba(156, 39, 176, 0.9)', 'rgba(156, 39, 176, 0.4)'), // Purple
+        createGradient(ctx, 'rgba(255, 99, 132, 0.9)', 'rgba(255, 99, 132, 0.4)'), // Pink
+        createGradient(ctx, 'rgba(0, 210, 211, 0.9)', 'rgba(0, 210, 211, 0.4)'), // Cyan
+        createGradient(ctx, 'rgba(255, 206, 86, 0.9)', 'rgba(255, 206, 86, 0.4)'), // Yellow
+        createGradient(ctx, 'rgba(119, 119, 119, 0.9)', 'rgba(119, 119, 119, 0.4)'), // Gray
+        createGradient(ctx, 'rgba(255, 159, 64, 0.9)', 'rgba(255, 159, 64, 0.4)'), // Light Orange
+        createGradient(ctx, 'rgba(75, 192, 192, 0.9)', 'rgba(75, 192, 192, 0.4)')  // Teal
     ];
     
-    // Static colors as fallback if gradients don't work
+    // Static colors as fallback (Refined colors)
     const staticColors = [
-        'rgba(29, 185, 84, 0.8)',
-        'rgba(255, 99, 132, 0.8)',
-        'rgba(54, 162, 235, 0.8)',
-        'rgba(255, 206, 86, 0.8)',
-        'rgba(153, 102, 255, 0.8)',
-        'rgba(255, 159, 64, 0.8)',
-        'rgba(75, 192, 192, 0.8)',
-        'rgba(255, 99, 255, 0.8)',
-        'rgba(99, 255, 132, 0.8)',
-        'rgba(128, 128, 128, 0.8)'
+        'rgba(29, 185, 84, 0.85)',
+        'rgba(74, 144, 226, 0.85)',
+        'rgba(255, 130, 0, 0.85)',
+        'rgba(156, 39, 176, 0.85)',
+        'rgba(255, 99, 132, 0.85)',
+        'rgba(0, 210, 211, 0.85)',
+        'rgba(255, 206, 86, 0.85)',
+        'rgba(119, 119, 119, 0.85)',
+        'rgba(255, 159, 64, 0.85)',
+        'rgba(75, 192, 192, 0.85)'
     ];
     
-    // Border colors
+    // Border colors (Refined colors)
     const borderColors = [
         'rgba(29, 185, 84, 1)',
+        'rgba(74, 144, 226, 1)',
+        'rgba(255, 130, 0, 1)',
+        'rgba(156, 39, 176, 1)',
         'rgba(255, 99, 132, 1)',
-        'rgba(54, 162, 235, 1)',
+        'rgba(0, 210, 211, 1)',
         'rgba(255, 206, 86, 1)',
-        'rgba(153, 102, 255, 1)',
+        'rgba(119, 119, 119, 1)',
         'rgba(255, 159, 64, 1)',
-        'rgba(75, 192, 192, 1)',
-        'rgba(255, 99, 255, 1)',
-        'rgba(99, 255, 132, 1)',
-        'rgba(128, 128, 128, 1)'
+        'rgba(75, 192, 192, 1)'
     ];
     
     // Chart configuration
@@ -396,63 +418,62 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: genresData.labels,
             datasets: [{
                 data: genresData.data,
-                backgroundColor: window.devicePixelRatio > 1 ? staticColors : gradients, // Use static colors for high DPI devices
+                backgroundColor: window.devicePixelRatio > 1.5 ? staticColors : gradients, // Adjusted DPI check
                 borderColor: borderColors,
-                borderWidth: 2,
-                hoverOffset: 15,
-                borderRadius: 5,
-                hoverBorderWidth: 3
+                borderWidth: 1.5, // Slightly thinner border
+                hoverOffset: 20, // Increased hover offset
+                borderRadius: 8, // Rounded corners for segments
+                hoverBorderWidth: 0, // Remove border on hover, rely on offset
+                hoverBorderColor: 'rgba(255, 255, 255, 0.2)' // Subtle hover border color if needed
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '65%',
+            cutout: '70%', // Larger cutout for a thinner doughnut
             animation: {
                 animateScale: true,
                 animateRotate: true,
-                duration: 2000,
-                easing: 'easeOutQuart'
+                duration: 1500, // Slightly faster animation
+                easing: 'easeInOutQuart' // Smoother easing
             },
             plugins: {
                 legend: {
-                    position: 'right',
-                    labels: {
-                        color: '#FFFFFF',
-                        font: {
-                            family: 'Montserrat',
-                            size: 12
-                        },
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
+                    display: false // Hide default legend, rely on the list
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(25, 20, 20, 0.9)',
+                    enabled: true,
+                    backgroundColor: 'rgba(18, 18, 18, 0.9)', // Darker tooltip
                     titleFont: {
-                        size: 14,
-                        weight: 'bold',
+                        size: 13,
+                        weight: '600', // Bolder title
                         family: 'Montserrat'
                     },
                     bodyFont: {
-                        size: 13,
+                        size: 12,
                         family: 'Montserrat'
                     },
-                    padding: 12,
-                    cornerRadius: 8,
-                    displayColors: true,
-                    usePointStyle: true,
+                    padding: 10,
+                    cornerRadius: 6,
+                    displayColors: false, // Hide color box in tooltip
+                    usePointStyle: false,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
                     callbacks: {
                         label: function(context) {
                             const label = context.label || '';
-                            const value = context.formattedValue;
+                            const value = context.raw;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = Math.round((context.raw / total) * 100);
-                            return `${label}: ${value} (${percentage}%)`;
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return `${label}: ${percentage}% (${value} artists)`;
                         }
                     }
                 }
+            },
+            onHover: (event, chartElement) => {
+                // Custom hover effect (optional, can enhance interaction)
+                const canvas = event.native.target;
+                canvas.style.cursor = chartElement.length ? 'pointer' : 'default';
             }
         }
     };
@@ -470,30 +491,67 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Get all segments in the chart
                 const segments = genreChart.getDatasetMeta(0).data;
                 
-                // Reset all segments to default
-                segments.forEach(segment => {
+                // Reset all segments to default state and dim others
+                segments.forEach((segment, i) => {
                     segment.options.offset = 0;
-                    segment.options.hoverOffset = 15;
+                    segment.options.borderWidth = 1.5;
+                    segment.options.borderColor = borderColors[i % borderColors.length];
+                    segment.options.backgroundColor = (window.devicePixelRatio > 1.5 ? staticColors : gradients)[i % gradients.length];
+                    segment.options.hoverOffset = 20;
+                    // Dim segments that are not hovered
+                    if (i !== index) {
+                        segment.options.backgroundColor = 'rgba(100, 100, 100, 0.2)'; // Dim color
+                        segment.options.borderColor = 'rgba(100, 100, 100, 0.5)';
+                        segment.options.hoverOffset = 0; // Disable hover offset for dimmed items
+                    }
                 });
                 
                 // Highlight the corresponding segment
                 if (segments[index]) {
-                    segments[index].options.offset = 20;
-                    genreChart.update();
+                    segments[index].options.offset = 25; // Increase offset for highlighted
+                    segments[index].options.borderWidth = 0;
+                    segments[index].options.backgroundColor = (window.devicePixelRatio > 1.5 ? staticColors : gradients)[index % gradients.length]; // Restore original color
+                    segments[index].options.borderColor = borderColors[index % borderColors.length];
+                    segments[index].options.hoverOffset = 25;
                 }
+                genreChart.update('none'); // Update without animation for instant feedback
             });
             
             item.addEventListener('mouseleave', () => {
                 // Return all segments to default
                 const segments = genreChart.getDatasetMeta(0).data;
-                segments.forEach(segment => {
+                segments.forEach((segment, i) => {
                     segment.options.offset = 0;
+                    segment.options.borderWidth = 1.5;
+                    segment.options.backgroundColor = (window.devicePixelRatio > 1.5 ? staticColors : gradients)[i % gradients.length];
+                    segment.options.borderColor = borderColors[i % borderColors.length];
+                    segment.options.hoverOffset = 20;
                 });
-                genreChart.update();
+                genreChart.update('none'); // Update without animation
             });
         });
         
-        console.log('Chart created successfully');
+        // Add hover interaction from chart to list items
+        chartCanvas.addEventListener('mousemove', (event) => {
+            const activeElements = genreChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+            
+            // Remove highlight from all list items first
+            genreItems.forEach(item => item.classList.remove('hover-highlight'));
+
+            if (activeElements.length > 0) {
+                const index = activeElements[0].index;
+                if (genreItems[index]) {
+                    genreItems[index].classList.add('hover-highlight'); // Add a class to style the list item
+                }
+            }
+        });
+
+        chartCanvas.addEventListener('mouseout', () => {
+            // Remove highlight from all list items when mouse leaves chart
+            genreItems.forEach(item => item.classList.remove('hover-highlight'));
+        });
+
+        console.log('Chart created successfully with enhanced interactions');
     } catch (error) {
         console.error('Error creating chart:', error);
         
@@ -552,4 +610,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<style>
+/* Add style for list item highlighting */
+.genre-item.hover-highlight {
+    transform: translateY(-3px) scale(1.02);
+    background: rgba(29, 185, 84, 0.1);
+    border-color: rgba(29, 185, 84, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.genre-item.hover-highlight .genre-rank {
+    transform: scale(1.15) rotate(8deg);
+    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.35);
+}
+
+.genre-item.hover-highlight .genre-name {
+    transform: translateX(4px);
+    color: var(--light);
+}
+
+.genre-item.hover-highlight .genre-count {
+    background: rgba(29, 185, 84, 0.25);
+    transform: scale(1.08);
+    color: #fff;
+}
+</style>
 {% endblock %}

@@ -41,6 +41,10 @@ class CustomSpotifyOAuth(BaseSpotifyOAuth):
             self.client_id = kwargs.get('client_id')
             self.client_secret = kwargs.get('client_secret')
             self.redirect_uri = kwargs.get('redirect_uri')
+            if self.redirect_uri and '\\x3a' in self.redirect_uri:
+                # Fix escaped characters in the redirect URI
+                self.redirect_uri = self.redirect_uri.replace('\\x3a', ':')
+                logger.debug(f"Fixed escaped characters in redirect_uri: {self.redirect_uri}")
             self.cache_path = kwargs.get('cache_path')
             self.scope = kwargs.get('scope', '')
             self.proxies = kwargs.get('proxies', None)
@@ -111,8 +115,10 @@ class CustomSpotifyOAuth(BaseSpotifyOAuth):
             if kwargs.get('show_dialog', self.show_dialog):
                 params['show_dialog'] = 'true'
                 
-            # Construct the URL with parameters
-            auth_url = self.OAUTH_AUTHORIZE_URL + '?' + '&'.join([f"{k}={requests.utils.quote(str(v))}" for k, v in params.items()])
+            # Construct the URL with parameters - make sure to properly encode each parameter
+            auth_url = self.OAUTH_AUTHORIZE_URL + '?' + '&'.join(
+                [f"{k}={requests.utils.quote(str(v), safe='')}" for k, v in params.items()]
+            )
             
             logger.debug("Authorization URL generated successfully: %s", auth_url[:50] + "..." if len(auth_url) > 50 else auth_url)
             return auth_url

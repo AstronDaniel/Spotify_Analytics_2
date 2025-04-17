@@ -19,26 +19,67 @@
         :root {
             --primary: #1DB954;
             --primary-dark: #1aa34a;
-            --dark: #191414;
-            --light: #FFFFFF;
-            --secondary: #B3B3B3;
-            --tertiary: #535353;
-            --glass-bg: rgba(25, 20, 20, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             --hover-transform: translateY(-5px);
             --transition-speed: 0.35s;
+
+            /* Default to Light Theme Variables */
+            --bg-color: #f8f9fa; /* Light background */
+            --text-color: #212529; /* Dark text */
+            --card-bg: rgba(255, 255, 255, 0.7); /* Lighter glass */
+            --card-border: rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --nav-bg: rgba(248, 249, 250, 0.8); /* Light nav */
+            --nav-border: rgba(0, 0, 0, 0.1);
+            --footer-bg: rgba(248, 249, 250, 0.9); /* Light footer */
+            --footer-text: #6c757d;
+            --btn-outline-bg: rgba(0, 0, 0, 0.02);
+            --btn-outline-border: rgba(0, 0, 0, 0.15);
+            --btn-outline-text: #212529;
+            --dropdown-bg: rgba(255, 255, 255, 0.9);
+            --dropdown-item-text: #212529;
+            --dropdown-item-hover-bg: rgba(29, 185, 84, 0.1);
+            --dropdown-item-hover-text: var(--primary);
+            --alert-success-bg: rgba(29, 185, 84, 0.1);
+            --alert-success-border: rgba(29, 185, 84, 0.2);
+            --alert-success-text: #0f5132;
+            --bg-gradient-1: rgba(29, 185, 84, 0.08); /* Lighter gradient */
+            --bg-gradient-2: rgba(54, 162, 235, 0.05);
         }
-        
+
+        [data-theme="dark"] {
+            --bg-color: #191414; /* Dark background */
+            --text-color: #FFFFFF; /* Light text */
+            --card-bg: rgba(25, 20, 20, 0.4); /* Darker glass */
+            --card-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --nav-bg: rgba(25, 20, 20, 0.7); /* Dark nav */
+            --nav-border: rgba(255, 255, 255, 0.1);
+            --footer-bg: rgba(25, 20, 20, 0.7); /* Dark footer */
+            --footer-text: #B3B3B3;
+            --btn-outline-bg: rgba(255, 255, 255, 0.05);
+            --btn-outline-border: rgba(255, 255, 255, 0.2);
+            --btn-outline-text: #FFFFFF;
+            --dropdown-bg: rgba(25, 20, 20, 0.85);
+            --dropdown-item-text: #FFFFFF;
+            --dropdown-item-hover-bg: rgba(29, 185, 84, 0.1);
+            --dropdown-item-hover-text: var(--primary);
+            --alert-success-bg: rgba(29, 185, 84, 0.15);
+            --alert-success-border: rgba(29, 185, 84, 0.3);
+            --alert-success-text: #d4edda;
+            --bg-gradient-1: rgba(29, 185, 84, 0.15); /* Original dark gradient */
+            --bg-gradient-2: rgba(54, 162, 235, 0.1);
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
+            background-color: var(--bg-color); /* Use theme variable */
+            color: var(--text-color); /* Use theme variable */
             position: relative;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed); /* Smooth theme transition */
         }
-        
+
         /* Background gradient effect */
         body::before {
             content: '';
@@ -47,103 +88,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: radial-gradient(circle at 20% 35%, rgba(29, 185, 84, 0.15) 0%, transparent 25%), 
-                              radial-gradient(circle at 75% 70%, rgba(54, 162, 235, 0.1) 0%, transparent 20%);
+            background-image: radial-gradient(circle at 20% 35%, var(--bg-gradient-1) 0%, transparent 25%), 
+                              radial-gradient(circle at 75% 70%, var(--bg-gradient-2) 0%, transparent 20%);
             filter: blur(90px);
             z-index: -1;
         }
-        
-        /* Glass Morphism Cards */
-        .glass-card {
-            background: var(--glass-bg);
+
+        /* Glass Morphism Cards (Applies to .glass-card and .card) */
+        .glass-card, .card {
+            background: var(--card-bg); /* Use theme variable */
             border-radius: 16px;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow); /* Use theme variable */
+            border: 1px solid var(--card-border); /* Use theme variable */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed), border-color var(--transition-speed);
             overflow: hidden;
+            color: var(--text-color); /* Ensure card text color follows theme */
         }
-        
-        .glass-card:hover {
+
+        .glass-card:hover, .card:hover {
             transform: var(--hover-transform);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); /* Keep hover shadow consistent or make theme-dependent */
+            border-color: rgba(29, 185, 84, 0.2); /* Example hover border */
         }
-        
+
         /* Navbar */
         .navbar {
-            background-color: rgba(25, 20, 20, 0.7);
+            background-color: var(--nav-bg); /* Use theme variable */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             padding: 1rem 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--nav-border); /* Use theme variable */
             z-index: 1030;
         }
-        
-        .navbar-toggler {
-            border-color: rgba(255, 255, 255, 0.1);
-            padding: 0.25rem 0.5rem;
-        }
-        
-        .navbar-toggler:focus {
-            box-shadow: 0 0 0 0.15rem rgba(29, 185, 84, 0.25);
-        }
-        
-        .navbar-nav .nav-item {
-            position: relative;
-            margin: 0 0.35rem;
-        }
-        
-        .navbar-nav .nav-item::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 50%;
-            background-color: var(--primary);
-            transition: width 0.3s ease, left 0.3s ease;
-        }
-        
-        .navbar-nav .nav-item:hover::after,
-        .navbar-nav .nav-item .nav-link.active::after {
-            width: 80%;
-            left: 10%;
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary) !important;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .navbar-brand::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(29, 185, 84, 0.2) 0%, transparent 80%);
-            top: 0;
-            left: 0;
-            transform: scale(0);
-            transition: transform 0.5s ease;
-            border-radius: 50%;
-        }
-        
-        .navbar-brand:hover {
-            transform: scale(1.05);
-        }
-        
-        .navbar-brand:hover::before {
-            transform: scale(1.5);
-        }
-        
+
         .nav-link {
-            color: var(--light) !important;
+            color: var(--text-color) !important; /* Use theme variable */
             font-weight: 500;
             margin: 0 0.5rem;
             transition: all 0.2s ease;
@@ -153,28 +136,28 @@
             border-radius: 6px;
             padding: 0.5rem 1rem !important;
         }
-        
+
         .nav-link:hover, .nav-link.active {
             color: var(--primary) !important;
             opacity: 1;
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(var(--primary), 0.1); /* Use primary color with alpha */
         }
-        
+
         /* Dropdown Menus */
         .dropdown-menu {
-            background-color: rgba(25, 20, 20, 0.85);
+            background-color: var(--dropdown-bg); /* Use theme variable */
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--card-border); /* Use card border for consistency */
             border-radius: 12px;
-            box-shadow: var(--glass-shadow);
+            box-shadow: var(--card-shadow); /* Use card shadow */
             padding: 0.75rem 0;
             margin-top: 0.5rem;
             transition: all 0.3s ease;
         }
-        
+
         .dropdown-item {
-            color: var(--light);
+            color: var(--dropdown-item-text); /* Use theme variable */
             padding: 0.6rem 1.25rem;
             font-weight: 500;
             border-radius: 6px;
@@ -182,108 +165,52 @@
             width: auto;
             transition: all 0.2s ease;
         }
-        
+
         .dropdown-item:hover {
-            background-color: rgba(29, 185, 84, 0.1);
-            color: var(--primary);
+            background-color: var(--dropdown-item-hover-bg); /* Use theme variable */
+            color: var(--dropdown-item-hover-text); /* Use theme variable */
             transform: translateX(3px);
         }
-        
-        /* Buttons */
-        .btn {
-            border-radius: 50px;
-            padding: 0.5rem 1.5rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.7s ease;
-            z-index: -1;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #1DB954, #1aa34a);
-            border: none;
-            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1ED760, #1DB954);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
-        }
-        
+
         .btn-outline-light {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--btn-outline-bg); /* Use theme variable */
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--light);
+            border: 1px solid var(--btn-outline-border); /* Use theme variable */
+            color: var(--btn-outline-text); /* Use theme variable */
         }
-        
+
         .btn-outline-light:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: var(--light);
+            background: rgba(var(--primary), 0.1); /* Example hover */
+            border-color: rgba(var(--primary), 0.3);
+            color: var(--primary); /* Example hover text */
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
-        
-        /* Cards */
-        .card {
-            background: var(--glass-bg);
-            border-radius: 16px;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            border-color: rgba(29, 185, 84, 0.2);
-        }
-        
+
         /* Footer */
         footer {
-            background-color: rgba(25, 20, 20, 0.7);
+            background-color: var(--footer-bg); /* Use theme variable */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            color: var(--secondary);
+            color: var(--footer-text); /* Use theme variable */
             padding: 2rem 0;
-            border-top: 1px solid var(--glass-border);
+            border-top: 1px solid var(--nav-border); /* Use nav border for consistency */
             position: relative;
             z-index: 1;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
-        
+
         footer a {
             transition: all 0.3s ease;
+            color: var(--footer-text); /* Ensure links inherit footer text color */
         }
-        
+
         footer a:hover {
             color: var(--primary) !important;
             transform: translateX(3px);
         }
-        
+
         .social-icon {
             display: inline-flex;
             align-items: center;
@@ -291,26 +218,28 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
+            background: rgba(128, 128, 128, 0.1); /* Neutral background */
+            border: 1px solid var(--card-border); /* Use card border */
+            color: var(--text-color); /* Use theme text color */
             transition: all 0.3s ease;
         }
-        
+
         .social-icon:hover {
             background: rgba(29, 185, 84, 0.1);
             border-color: rgba(29, 185, 84, 0.3);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: var(--primary); /* Make icon primary on hover */
         }
-        
-        /* Section Titles */
+
         .section-title {
             font-weight: 700;
             position: relative;
             margin-bottom: 2rem;
             display: inline-block;
+            color: var(--text-color); /* Use theme variable */
         }
-        
+
         .section-title::after {
             content: '';
             position: absolute;
@@ -322,66 +251,40 @@
             border-radius: 3px;
             transition: width 0.3s ease;
         }
-        
+
         .section-title:hover::after {
             width: 100%;
         }
-        
-        /* Chart Containers */
+
         .chart-container {
-            background: var(--glass-bg);
+            background: var(--card-bg); /* Use theme variable */
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--card-border); /* Use theme variable */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             transition: all 0.3s ease;
         }
-        
+
         .chart-container:hover {
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             border-color: rgba(29, 185, 84, 0.2);
         }
-        
-        /* Alert Messages */
+
         .alert {
             border-radius: 12px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid transparent; /* Base border */
         }
-        
+
         .alert-success {
-            background-color: rgba(29, 185, 84, 0.15);
-            border-color: rgba(29, 185, 84, 0.3);
-            color: #d4edda;
+            background-color: var(--alert-success-bg); /* Use theme variable */
+            border-color: var(--alert-success-border); /* Use theme variable */
+            color: var(--alert-success-text); /* Use theme variable */
         }
-        
-        .alert-danger {
-            background-color: rgba(220, 53, 69, 0.15);
-            border-color: rgba(220, 53, 69, 0.3);
-            color: #f8d7da;
-        }
-        
-        .alert-warning {
-            background-color: rgba(255, 193, 7, 0.15);
-            border-color: rgba(255, 193, 7, 0.3);
-            color: #fff3cd;
-        }
-        
-        .alert-info {
-            background-color: rgba(13, 202, 240, 0.15);
-            border-color: rgba(13, 202, 240, 0.3);
-            color: #d1ecf1;
-        }
-        
-        /* Animations */
-        .animate-in {
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-        }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -392,8 +295,7 @@
                 transform: translateY(0);
             }
         }
-        
-        /* Responsive Design */
+
         @media (max-width: 991.98px) {
             .navbar-nav .dropdown-menu {
                 position: static;
@@ -419,7 +321,7 @@
     <!-- Custom CSS per page -->
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body data-theme="dark">
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
@@ -479,7 +381,11 @@
                         </a>
                     </li>
                 </ul>
-                <div class="d-flex">
+                <div class="d-flex align-items-center">
+                    <!-- Theme Toggle Button -->
+                    <button id="theme-toggle" class="btn btn-sm btn-outline-secondary me-2" type="button" style="border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-sun"></i>
+                    </button>
                     {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -602,17 +508,47 @@
     <!-- Custom JS per page -->
     {% block extra_js %}{% endblock %}
     
-    <!-- Custom JS for navigation and effects -->
+    <!-- Theme Switcher and Custom JS -->
     <script>
+    (function() {
+        const html = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const lightIcon = '<i class="fas fa-sun"></i>';
+        const darkIcon = '<i class="fas fa-moon"></i>';
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (toggle) {
+                toggle.innerHTML = theme === 'light' ? darkIcon : lightIcon;
+                if (theme === 'light') {
+                    toggle.classList.remove('btn-outline-light');
+                    toggle.classList.add('btn-outline-dark');
+                } else {
+                    toggle.classList.remove('btn-outline-dark');
+                    toggle.classList.add('btn-outline-light');
+                }
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
+
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                applyTheme(newTheme);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Add animation classes to elements
             const elementsToAnimate = document.querySelectorAll('.card, .glass-card, .section-title, h1, h2');
             elementsToAnimate.forEach((element, index) => {
                 element.classList.add('animate-in');
                 element.style.animationDelay = (0.1 * index) + 's';
             });
             
-            // Close mobile menu when clicking a link
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
             const navbarToggler = document.querySelector('.navbar-toggler');
             const navbarCollapse = document.querySelector('.navbar-collapse');
@@ -625,7 +561,6 @@
                 });
             });
             
-            // Add active class to parent dropdown if a child is active
             const activeDropdownItem = document.querySelector('.dropdown-item.active');
             if (activeDropdownItem) {
                 const dropdownParent = activeDropdownItem.closest('.dropdown');
@@ -637,7 +572,6 @@
                 }
             }
             
-            // Add scroll listener for navbar effects
             window.addEventListener('scroll', function() {
                 const navbar = document.querySelector('.navbar');
                 if (window.scrollY > 50) {
@@ -649,6 +583,7 @@
                 }
             });
         });
+    })();
     </script>
 </body>
 </html>
