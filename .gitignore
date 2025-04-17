@@ -1,0 +1,11 @@
+
+.env
+db.sqlite3
+venv
+*.log
+spotify_debug.log
+users\migrations
+users\__pycache__
+spotify_debug.log
+
+

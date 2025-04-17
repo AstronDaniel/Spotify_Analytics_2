@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+
+{% block title %}Time Comparison - Spotify Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .visualization-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header {
+        position: relative;
+        margin-bottom: 3rem;
+        padding: 2.5rem 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(54, 162, 235, 0.15) 100%);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        z-index: -1;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    
+    .chart-container {
+        height: 300px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .viz-side-menu {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+    }
+    
+    .viz-card {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        padding: 1.75rem;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+    }
+    
+    .viz-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.025) 0%, transparent 70%);
+        z-index: 0;
+    }
+    
+    .viz-card > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .viz-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        border-color: rgba(29, 185, 84, 0.2);
+    }
+    
+    .section-heading {
+        position: relative;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+    
+    .section-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #1DB954, #1aa34a);
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .section-heading:hover::after {
+        width: 100%;
+    }
+    
+    .comparison-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .comparison-table th {
+        text-align: center;
+        font-weight: 600;
+        padding: 0.75rem;
+        color: var(--light);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .comparison-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        vertical-align: middle;
+        transition: all 0.2s ease;
+    }
+    
+    .comparison-table tr:hover td {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .comparison-table .rank {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin: 0 auto;
+        transition: transform 0.3s ease;
+    }
+    
+    .comparison-table tr:hover .rank {
+        transform: scale(1.15);
+    }
+    
+    .short-term .rank {
+        background: linear-gradient(135deg, #1DB954, #1aa34a);
+        box-shadow: 0 3px 10px rgba(29, 185, 84, 0.3);
+    }
+    
+    .medium-term .rank {
+        background: linear-gradient(135deg, #4A90E2, #5465FF);
+        box-shadow: 0 3px 10px rgba(84, 101, 255, 0.3);
+    }
+    
+    .long-term .rank {
+        background: linear-gradient(135deg, #9C27B0, #673AB7);
+        box-shadow: 0 3px 10px rgba(156, 39, 176, 0.3);
+    }
+    
+    .artist-name {
+        font-weight: 500;
+        transition: transform 0.2s ease;
+    }
+    
+    .comparison-table tr:hover .artist-name {
+        transform: translateX(3px);
+    }
+    
+    .artist-genres {
+        font-size: 0.875rem;
+        color: var(--secondary);
+        transition: all 0.3s ease;
+    }
+    
+    .comparison-table tr:hover .artist-genres {
+        color: var(--light);
+    }
+    
+    .score-container {
+        position: relative;
+        text-align: center;
+        border-radius: 16px;
+        overflow: hidden;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: all 0.3s ease;
+    }
+    
+    .score-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .score-value {
+        font-size: 4rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 2;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .score-label {
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        z-index: 2;
+        font-weight: 600;
+        color: var(--secondary);
+    }
+    
+    .score-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), transparent);
+        opacity: 0.1;
+        z-index: 1;
+        transition: all 0.5s ease;
+    }
+    
+    .score-container:hover .score-background {
+        opacity: 0.15;
+        width: 100% !important;
+    }
+    
+    .time-label {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .time-label.short {
+        background-color: rgba(29, 185, 84, 0.1);
+        color: #1DB954;
+    }
+    
+    .time-label.medium {
+        background-color: rgba(84, 101, 255, 0.1);
+        color: #5465FF;
+    }
+    
+    .time-label.long {
+        background-color: rgba(156, 39, 176, 0.1);
+        color: #9C27B0;
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    .stagger-item {
+        opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    :root {
+        --chartColors-short-background: rgba(29, 185, 84, 0.7);
+        --chartColors-medium-background: rgba(84, 101, 255, 0.7);
+        --chartColors-long-background: rgba(156, 39, 176, 0.7);
+        --chartColors-short-border: #1DB954;
+        --chartColors-medium-border: #5465FF;
+        --chartColors-long-border: #9C27B0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="visualization-container">
+    <div class="page-header animate-in">
+        <div class="container">
+            <h1 class="page-title">Time Comparison</h1>
+            <p class="lead mb-0">This visualization compares your listening habits across different time periods: recent (4 weeks), mid-term (6 months), and long-term (years).</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="viz-side-menu animate-in" style="animation-delay: 0.1s;">
+                    {% include 'includes/visualization_nav.html' %}
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Similarity Scores -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="animate-in" style="animation-delay: 0.2s;">
+                            <div class="score-container short-term">
+                                <span class="time-label short">Recent to Mid-term</span>
+                                <div class="score-value">{{ similarity_short_medium|floatformat:0 }}%</div>
+                                <div class="score-label">Similarity</div>
+                                <div class="score-background" style="width: {{ similarity_short_medium }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="animate-in" style="animation-delay: 0.3s;">
+                            <div class="score-container medium-term">
+                                <span class="time-label medium">Mid-term to Long-term</span>
+                                <div class="score-value">{{ similarity_medium_long|floatformat:0 }}%</div>
+                                <div class="score-label">Similarity</div>
+                                <div class="score-background" style="width: {{ similarity_medium_long }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="animate-in" style="animation-delay: 0.4s;">
+                            <div class="score-container long-term">
+                                <span class="time-label long">Recent to Long-term</span>
+                                <div class="score-value">{{ similarity_short_long|floatformat:0 }}%</div>
+                                <div class="score-label">Similarity</div>
+                                <div class="score-background" style="width: {{ similarity_short_long }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="viz-card mb-5 animate-in" style="animation-delay: 0.5s;">
+                    <h2 class="section-heading">Artist Overlap</h2>
+                    <div class="chart-container">
+                        <canvas id="timeComparisonChart"></canvas>
+                    </div>
+                    <p class="mb-0 text-center text-secondary">This chart shows how your top artists appear across different time periods.</p>
+                </div>
+                
+                <!-- Top Artists Comparison Table -->
+                <div class="viz-card animate-in" style="animation-delay: 0.6s;">
+                    <h2 class="section-heading">Top Artists Comparison</h2>
+                    <div class="table-responsive">
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 33%;">
+                                        <span class="time-label short">Recent (4 weeks)</span>
+                                    </th>
+                                    <th style="width: 33%;">
+                                        <span class="time-label medium">Mid-term (6 months)</span>
+                                    </th>
+                                    <th style="width: 33%;">
+                                        <span class="time-label long">Long-term (years)</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in top_artists_range %}
+                                <tr>
+                                    <td class="short-term">
+                                        {% if short_term_artists|length > i %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="rank">{{ i|add:"1" }}</div>
+                                            <div class="ms-3">
+                                                <div class="artist-name">{{ short_term_artists.i.name }}</div>
+                                                <div class="artist-genres">
+                                                    {% for genre in short_term_artists.i.genres|slice:":2" %}
+                                                    {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="medium-term">
+                                        {% if medium_term_artists|length > i %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="rank">{{ i|add:"1" }}</div>
+                                            <div class="ms-3">
+                                                <div class="artist-name">{{ medium_term_artists.i.name }}</div>
+                                                <div class="artist-genres">
+                                                    {% for genre in medium_term_artists.i.genres|slice:":2" %}
+                                                    {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="long-term">
+                                        {% if long_term_artists|length > i %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="rank">{{ i|add:"1" }}</div>
+                                            <div class="ms-3">
+                                                <div class="artist-name">{{ long_term_artists.i.name }}</div>
+                                                <div class="artist-genres">
+                                                    {% for genre in long_term_artists.i.genres|slice:":2" %}
+                                                    {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h3 class="h5 mb-3">Time Comparison Insights</h3>
+                        <p>
+                            {% if similarity_short_medium > 70 %}
+                            Your recent listening habits are <span class="fw-bold text-success">very similar</span> to your mid-term preferences, showing consistency in your music taste over the past 6 months.
+                            {% elif similarity_short_medium > 40 %}
+                            Your recent listening habits show <span class="fw-bold text-primary">moderate changes</span> compared to your mid-term preferences, indicating evolving musical interests.
+                            {% else %}
+                            Your recent listening habits are <span class="fw-bold text-danger">significantly different</span> from your mid-term preferences, suggesting you're exploring new artists and genres.
+                            {% endif %}
+                        </p>
+                        
+                        <p>
+                            {% if similarity_short_long > 60 %}
+                            Your current favorites align closely with your long-term listening habits, showing a <span class="fw-bold text-success">strong dedication</span> to your core musical preferences.
+                            {% elif similarity_short_long > 30 %}
+                            There's <span class="fw-bold text-primary">some overlap</span> between your current and long-term musical preferences, with a healthy balance of new discoveries and old favorites.
+                            {% else %}
+                            Your current music taste has <span class="fw-bold text-danger">evolved significantly</span> from your long-term preferences, showing a journey of musical exploration and changing tastes.
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-end">
+                        <a href="{% url 'export_data' %}" class="btn btn-primary">
+                            <i class="fas fa-file-export me-2"></i> Export Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

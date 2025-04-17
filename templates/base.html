@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Spotify Analytics Platform{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: #1DB954;
+            --primary-dark: #1aa34a;
+            --dark: #191414;
+            --light: #FFFFFF;
+            --secondary: #B3B3B3;
+            --tertiary: #535353;
+            --glass-bg: rgba(25, 20, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --hover-transform: translateY(-5px);
+            --transition-speed: 0.35s;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Background gradient effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 35%, rgba(29, 185, 84, 0.15) 0%, transparent 25%), 
+                              radial-gradient(circle at 75% 70%, rgba(54, 162, 235, 0.1) 0%, transparent 20%);
+            filter: blur(90px);
+            z-index: -1;
+        }
+        
+        /* Glass Morphism Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            overflow: hidden;
+        }
+        
+        .glass-card:hover {
+            transform: var(--hover-transform);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Navbar */
+        .navbar {
+            background-color: rgba(25, 20, 20, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1030;
+        }
+        
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.15rem rgba(29, 185, 84, 0.25);
+        }
+        
+        .navbar-nav .nav-item {
+            position: relative;
+            margin: 0 0.35rem;
+        }
+        
+        .navbar-nav .nav-item::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+        
+        .navbar-nav .nav-item:hover::after,
+        .navbar-nav .nav-item .nav-link.active::after {
+            width: 80%;
+            left: 10%;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .navbar-brand::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(29, 185, 84, 0.2) 0%, transparent 80%);
+            top: 0;
+            left: 0;
+            transform: scale(0);
+            transition: transform 0.5s ease;
+            border-radius: 50%;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        .navbar-brand:hover::before {
+            transform: scale(1.5);
+        }
+        
+        .nav-link {
+            color: var(--light) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: all 0.2s ease;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            border-radius: 6px;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary) !important;
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Dropdown Menus */
+        .dropdown-menu {
+            background-color: rgba(25, 20, 20, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: var(--glass-shadow);
+            padding: 0.75rem 0;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-item {
+            color: var(--light);
+            padding: 0.6rem 1.25rem;
+            font-weight: 500;
+            border-radius: 6px;
+            margin: 0 0.5rem;
+            width: auto;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(29, 185, 84, 0.1);
+            color: var(--primary);
+            transform: translateX(3px);
+        }
+        
+        /* Buttons */
+        .btn {
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1DB954, #1aa34a);
+            border: none;
+            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1ED760, #1DB954);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+        }
+        
+        .btn-outline-light {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--light);
+        }
+        
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(29, 185, 84, 0.2);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: rgba(25, 20, 20, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--secondary);
+            padding: 2rem 0;
+            border-top: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+        }
+        
+        footer a {
+            transition: all 0.3s ease;
+        }
+        
+        footer a:hover {
+            color: var(--primary) !important;
+            transform: translateX(3px);
+        }
+        
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background: rgba(29, 185, 84, 0.1);
+            border-color: rgba(29, 185, 84, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Section Titles */
+        .section-title {
+            font-weight: 700;
+            position: relative;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            height: 3px;
+            width: 50px;
+            background-color: var(--primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .section-title:hover::after {
+            width: 100%;
+        }
+        
+        /* Chart Containers */
+        .chart-container {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(29, 185, 84, 0.2);
+        }
+        
+        /* Alert Messages */
+        .alert {
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .alert-success {
+            background-color: rgba(29, 185, 84, 0.15);
+            border-color: rgba(29, 185, 84, 0.3);
+            color: #d4edda;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #f8d7da;
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #fff3cd;
+        }
+        
+        .alert-info {
+            background-color: rgba(13, 202, 240, 0.15);
+            border-color: rgba(13, 202, 240, 0.3);
+            color: #d1ecf1;
+        }
+        
+        /* Animations */
+        .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
+            .navbar-nav .dropdown-menu {
+                position: static;
+                float: none;
+                width: auto;
+                margin-top: 0;
+                background-color: rgba(25, 20, 20, 0.3);
+                border: 0;
+                box-shadow: none;
+                padding-left: 1rem;
+            }
+            
+            .dropdown-menu-dark .dropdown-item {
+                color: rgba(255, 255, 255, 0.8);
+            }
+            
+            .navbar-nav .nav-item::after {
+                display: none;
+            }
+        }
+    </style>
+    
+    <!-- Custom CSS per page -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fab fa-spotify me-2"></i>Spotify Analytics
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" aria-current="page" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'public_trends' in request.path %}active{% endif %}" href="{% url 'public_trends' %}">
+                            <i class="fas fa-fire me-1"></i> Music Trends
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'dashboard' %}">
+                            <i class="fas fa-chart-line me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'personal_insights' in request.path %}active{% endif %}" href="{% url 'personal_insights' %}">
+                            <i class="fas fa-lightbulb me-1"></i> My Insights
+                        </a>
+                    </li>
+                    <!-- Visualization dropdown menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if 'visualization' in request.path %}active{% endif %}" href="#" id="visualizationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-chart-pie me-1"></i> Visualizations
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="visualizationDropdown">
+                            <li><a class="dropdown-item {% if 'genre_distribution' in request.path %}active{% endif %}" href="{% url 'genre_distribution' %}">
+                                <i class="fas fa-record-vinyl me-2"></i> Genre Distribution
+                            </a></li>
+                            <li><a class="dropdown-item {% if 'audio_features' in request.path %}active{% endif %}" href="{% url 'audio_features' %}">
+                                <i class="fas fa-sliders me-2"></i> Audio Features
+                            </a></li>
+                            <li><a class="dropdown-item {% if 'time_comparison' in request.path %}active{% endif %}" href="{% url 'time_comparison' %}">
+                                <i class="fas fa-clock-rotate-left me-2"></i> Time Comparison
+                            </a></li>
+                            <li><a class="dropdown-item {% if 'export_data' in request.path %}active{% endif %}" href="{% url 'export_data' %}">
+                                <i class="fas fa-file-export me-2"></i> Export Data
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">
+                            <i class="fas fa-info-circle me-1"></i> About
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-1"></i> {{ user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                <i class="fas fa-user-circle me-2"></i> Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'settings' %}">
+                                <i class="fas fa-gear me-2"></i> Settings
+                            </a></li>
+                            {% if not request.session.spotify_token_info %}
+                            <li><a class="dropdown-item" href="{% url 'spotify_login' %}">
+                                <i class="fab fa-spotify me-2"></i> Connect Spotify
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-light me-2">
+                        <i class="fas fa-sign-in-alt me-1"></i> Log In
+                    </a>
+                    <a href="{% url 'spotify_login' %}" class="btn btn-primary">
+                        <i class="fab fa-spotify me-1"></i> Connect with Spotify
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        {% if messages %}
+            <div class="messages mb-4 animate-in">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3 fw-bold"><i class="fab fa-spotify me-2"></i>Spotify Analytics</h5>
+                    <p class="mb-0">A comprehensive analytics platform that provides deep insights into music preferences and listening patterns using the Spotify API.</p>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5 class="mb-3 fw-bold">Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none text-secondary d-inline-block">
+                            <i class="fas fa-chevron-right me-1 small"></i> Home
+                        </a></li>
+                        <li class="mb-2"><a href="{% url 'public_trends' %}" class="text-decoration-none text-secondary d-inline-block">
+                            <i class="fas fa-chevron-right me-1 small"></i> Music Trends
+                        </a></li>
+                        <li class="mb-2"><a href="{% url 'about' %}" class="text-decoration-none text-secondary d-inline-block">
+                            <i class="fas fa-chevron-right me-1 small"></i> About
+                        </a></li>
+                        <li><a href="{% url 'contact' %}" class="text-decoration-none text-secondary d-inline-block">
+                            <i class="fas fa-chevron-right me-1 small"></i> Contact
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5 class="mb-3 fw-bold">Legal</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'privacy' %}" class="text-decoration-none text-secondary d-inline-block">
+                            <i class="fas fa-chevron-right me-1 small"></i> Privacy
+                        </a></li>
+                        <li><a href="{% url 'terms' %}" class="text-decoration-none text-secondary d-inline-block">
+                            <i class="fas fa-chevron-right me-1 small"></i> Terms
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3 fw-bold">Connect</h5>
+                    <div class="d-flex gap-2 mb-3">
+                        <a href="#" class="social-icon text-secondary">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-icon text-secondary">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-icon text-secondary">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-icon text-secondary">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="mb-0">&copy; {% now "Y" %} Spotify Analytics. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom JS per page -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Custom JS for navigation and effects -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation classes to elements
+            const elementsToAnimate = document.querySelectorAll('.card, .glass-card, .section-title, h1, h2');
+            elementsToAnimate.forEach((element, index) => {
+                element.classList.add('animate-in');
+                element.style.animationDelay = (0.1 * index) + 's';
+            });
+            
+            // Close mobile menu when clicking a link
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')) {
+                        navbarToggler.click();
+                    }
+                });
+            });
+            
+            // Add active class to parent dropdown if a child is active
+            const activeDropdownItem = document.querySelector('.dropdown-item.active');
+            if (activeDropdownItem) {
+                const dropdownParent = activeDropdownItem.closest('.dropdown');
+                if (dropdownParent) {
+                    const dropdownToggle = dropdownParent.querySelector('.dropdown-toggle');
+                    if (dropdownToggle) {
+                        dropdownToggle.classList.add('active');
+                    }
+                }
+            }
+            
+            // Add scroll listener for navbar effects
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(25, 20, 20, 0.9)';
+                    navbar.style.padding = '0.75rem 2rem';
+                } else {
+                    navbar.style.background = 'rgba(25, 20, 20, 0.7)';
+                    navbar.style.padding = '1rem 2rem';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

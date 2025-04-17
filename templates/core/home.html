@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Spotify Analytics - Music Insights & Trends{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <h1 class="display-4 fw-bold mb-4">Discover Your Music DNA</h1>
+            <p class="fs-5 mb-4">Get deep insights into your music preferences and listening patterns with our comprehensive analytics platform powered by Spotify data.</p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'spotify_login' %}" class="btn btn-primary btn-lg">
+                    <i class="fab fa-spotify me-2"></i>Connect with Spotify
+                </a>
+                <a href="{% url 'public_trends' %}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-chart-line me-2"></i>Explore Music Trends
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1651838644572-0a42d740d902?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fG11c2ljJTIwZGFzaGJvYXJkfGVufDB8fDB8fHww" alt="Spotify Analytics Dashboard" class="img-fluid rounded shadow-lg">
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <h2 class="section-title">Key Features</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-chart-pie fa-2x text-primary me-3"></i>
+                    <h3 class="h4 mb-0">Music Trend Analysis</h3>
+                </div>
+                <p class="mb-0">Visualize global and personal music trends with interactive charts and discover what's trending in different regions and timeframes.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-user-chart fa-2x text-primary me-3"></i>
+                    <h3 class="h4 mb-0">Personal Insights</h3>
+                </div>
+                <p class="mb-0">Understand your listening habits, genre preferences, and discover hidden patterns in your music taste over time.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-music fa-2x text-primary me-3"></i>
+                    <h3 class="h4 mb-0">Audio Feature Analysis</h3>
+                </div>
+                <p class="mb-0">Deep dive into the technical aspects of your favorite songs, analyzing tempo, energy, danceability, and more.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-globe fa-2x text-primary me-3"></i>
+                    <h3 class="h4 mb-0">Global Comparisons</h3>
+                </div>
+                <p class="mb-0">Compare your music taste with global trends and see how your preferences stack up against listeners from around the world.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-clock-rotate-left fa-2x text-primary me-3"></i>
+                    <h3 class="h4 mb-0">Time-Based Analysis</h3>
+                </div>
+                <p class="mb-0">Track how your music preferences have evolved over time and compare different eras or periods in your listening history.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-share-nodes fa-2x text-primary me-3"></i>
+                    <h3 class="h4 mb-0">Share Your Insights</h3>
+                </div>
+                <p class="mb-0">Export and share your personalized music analytics with friends on social media or download detailed reports.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 text-center">
+    <div class="p-5 bg-dark rounded-4 shadow">
+        <h2 class="display-5 fw-bold mb-4">Ready to Explore Your Music Insights?</h2>
+        <p class="fs-5 mb-4">Connect your Spotify account to unlock personalized analytics and discover more about your listening habits.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'spotify_login' %}" class="btn btn-primary btn-lg px-5">
+                <i class="fab fa-spotify me-2"></i>Get Started Now
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <h2 class="section-title">How It Works</h2>
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-plug-circle-bolt text-white fa-2x"></i>
+                </div>
+                <h3 class="h5 mb-3">Connect</h3>
+                <p>Link your Spotify account with just a few clicks</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-database text-white fa-2x"></i>
+                </div>
+                <h3 class="h5 mb-3">Process</h3>
+                <p>We analyze your music data and listening patterns</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-chart-simple text-white fa-2x"></i>
+                </div>
+                <h3 class="h5 mb-3">Visualize</h3>
+                <p>View interactive charts and detailed analytics</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="text-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-lightbulb text-white fa-2x"></i>
+                </div>
+                <h3 class="h5 mb-3">Discover</h3>
+                <p>Gain insights and discover new music based on analysis</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+    <h2 class="section-title">What Users Say</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex mb-3">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                </div>
+                <p class="fst-italic mb-3">"This platform completely transformed how I understand my music taste. The visualizations are stunning and the insights are surprisingly accurate!"</p>
+                <div class="d-flex align-items-center mt-auto">
+                    <div class="bg-secondary rounded-circle me-3" style="width: 40px; height: 40px;"></div>
+                    <div>
+                        <h5 class="h6 mb-0">Alex Johnson</h5>
+                        <small class="text-secondary">Music Enthusiast</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex mb-3">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                </div>
+                <p class="fst-italic mb-3">"I was amazed to see how my music preferences have evolved over the years. The time-based analysis feature is brilliant and eye-opening!"</p>
+                <div class="d-flex align-items-center mt-auto">
+                    <div class="bg-secondary rounded-circle me-3" style="width: 40px; height: 40px;"></div>
+                    <div>
+                        <h5 class="h6 mb-0">Sarah Williams</h5>
+                        <small class="text-secondary">Spotify Premium User</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex mb-3">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star-half-alt text-warning"></i>
+                </div>
+                <p class="fst-italic mb-3">"As a music producer, the audio feature analysis has been invaluable in helping me understand current trends and what resonates with listeners."</p>
+                <div class="d-flex align-items-center mt-auto">
+                    <div class="bg-secondary rounded-circle me-3" style="width: 40px; height: 40px;"></div>
+                    <div>
+                        <h5 class="h6 mb-0">Michael Rodriguez</h5>
+                        <small class="text-secondary">Music Producer</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

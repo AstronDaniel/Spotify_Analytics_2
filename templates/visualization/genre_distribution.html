@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+
+{% block title %}Genre Distribution - Spotify Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .visualization-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header {
+        position: relative;
+        margin-bottom: 3rem;
+        padding: 2.5rem 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(54, 162, 235, 0.15) 100%);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        z-index: -1;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    
+    .chart-container {
+        height: 400px;
+        position: relative;
+    }
+    
+    .genre-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.85rem 1rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+    }
+    
+    .genre-item:hover {
+        transform: translateX(5px);
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.08) 0%, rgba(29, 185, 84, 0.01) 100%);
+        border-color: rgba(29, 185, 84, 0.2);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .genre-rank {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1DB954, #1aa34a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-weight: 600;
+        box-shadow: 0 3px 10px rgba(29, 185, 84, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .genre-item:hover .genre-rank {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
+    }
+    
+    .genre-name {
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .genre-item:hover .genre-name {
+        transform: translateX(2px);
+    }
+    
+    .genre-count {
+        margin-left: auto;
+        font-weight: 600;
+        color: var(--primary);
+        background: rgba(29, 185, 84, 0.1);
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    
+    .genre-item:hover .genre-count {
+        background: rgba(29, 185, 84, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .viz-side-menu {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+    }
+    
+    .viz-card {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        padding: 1.75rem;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .viz-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.025) 0%, transparent 70%);
+        z-index: 0;
+    }
+    
+    .viz-card > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .viz-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        border-color: rgba(29, 185, 84, 0.2);
+    }
+    
+    .section-heading {
+        position: relative;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+    
+    .section-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #1DB954, #1aa34a);
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .section-heading:hover::after {
+        width: 100%;
+    }
+    
+    .insights-highlight {
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+    }
+    
+    .stagger-item {
+        opacity: 0;
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="visualization-container">
+    <div class="page-header animate-in">
+        <div class="container">
+            <h1 class="page-title">Genre Distribution</h1>
+            <p class="lead mb-0">Explore the distribution of music genres based on your top artists and discover which genres dominate your listening habits.</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="viz-side-menu animate-in" style="animation-delay: 0.1s;">
+                    {% include 'includes/visualization_nav.html' %}
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="row g-4">
+                    <!-- Pie Chart -->
+                    <div class="col-md-7 mb-4">
+                        <div class="viz-card animate-in" style="animation-delay: 0.2s;">
+                            <h2 class="section-heading">Your Top Genres</h2>
+                            <div class="chart-container">
+                                <canvas id="genreChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Genre List -->
+                    <div class="col-md-5 mb-4">
+                        <div class="viz-card animate-in" style="animation-delay: 0.3s;">
+                            <h2 class="section-heading">Genre Ranking</h2>
+                            <div class="genre-list">
+                                {% for genre, count in top_genres %}
+                                <div class="genre-item stagger-item" style="animation-delay: {{ forloop.counter|add:"3" |floatformat:1 }}00ms">
+                                    <div class="genre-rank">{{ forloop.counter }}</div>
+                                    <div class="genre-name">{{ genre|title }}</div>
+                                    <div class="genre-count">{{ count }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Insights -->
+                <div class="viz-card mt-3 animate-in" style="animation-delay: 0.4s;">
+                    <h2 class="section-heading">Genre Insights</h2>
+                    
+                    {% if top_genres %}
+                    <p>Your top genre is <span class="insights-highlight">{{ top_genres.0.0|title }}</span> which represents <span class="insights-highlight">{{ top_genres.0.1 }}</span> artists in your listening habits.</p>
+                    
+                    {% if top_genres|length >= 3 %}
+                    <p>Your top 3 genres make up a significant portion of your music taste, showing 
+                    {% if top_genres|length > 5 %}<span class="insights-highlight">a diverse</span>{% else %}<span class="insights-highlight">a focused</span>{% endif %} listening pattern.</p>
+                    {% endif %}
+                    
+                    <p>Based on your genre distribution, you appear to prefer 
+                    {% with primary_genre=top_genres.0.0 %}
+                        {% if 'rock' in primary_genre %}<span class="insights-highlight">rock-based music</span>
+                        {% elif 'pop' in primary_genre %}<span class="insights-highlight">pop-oriented sounds</span>
+                        {% elif 'hip hop' in primary_genre or 'rap' in primary_genre %}<span class="insights-highlight">hip-hop and rap</span>
+                        {% elif 'electronic' in primary_genre or 'edm' in primary_genre or 'house' in primary_genre %}<span class="insights-highlight">electronic and dance music</span>
+                        {% elif 'r&b' in primary_genre %}<span class="insights-highlight">R&B and soul</span>
+                        {% elif 'jazz' in primary_genre %}<span class="insights-highlight">jazz and improvisational music</span>
+                        {% elif 'classical' in primary_genre %}<span class="insights-highlight">classical compositions</span>
+                        {% elif 'country' in primary_genre %}<span class="insights-highlight">country music</span>
+                        {% elif 'folk' in primary_genre %}<span class="insights-highlight">folk and acoustic styles</span>
+                        {% elif 'metal' in primary_genre %}<span class="insights-highlight">metal and harder rock</span>
+                        {% else %}<span class="insights-highlight">eclectic music styles</span>
+                        {% endif %}
+                    {% endwith %}.</p>
+                    
+                    <div class="mt-4 d-flex justify-content-end">
+                        <a href="{% url 'audio_features' %}" class="btn btn-primary">
+                            <i class="fas fa-sliders me-2"></i> Explore Audio Features
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> We couldn't find enough genre data to provide insights. Try listening to more music or exploring new artists!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Chart initialization starting');
+    
+    // Animate staggered items in
+    const staggerItems = document.querySelectorAll('.stagger-item');
+    staggerItems.forEach(item => {
+        item.classList.add('animate-in');
+    });
+    
+    // Get the chart canvas element
+    const chartCanvas = document.getElementById('genreChart');
+    if (!chartCanvas) {
+        console.error('Chart canvas element not found');
+        return;
+    }
+    
+    const ctx = chartCanvas.getContext('2d');
+    
+    // Get the data from the Django template
+    // If genres_data is not provided, use fallback data for testing
+    let genresData;
+    try {
+        genresData = {{ genres_data|safe }};
+        console.log('Genre data loaded:', genresData);
+    } catch (e) {
+        console.error('Error loading genre data:', e);
+        // Fallback data for testing
+        genresData = {
+            labels: ['Pop', 'Rock', 'Hip Hop', 'Electronic', 'R&B'],
+            data: [30, 25, 20, 15, 10]
+        };
+        console.log('Using fallback data:', genresData);
+    }
+    
+    // Define gradient colors
+    const createGradient = (ctx, colorStart, colorEnd) => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, colorStart);
+        gradient.addColorStop(1, colorEnd);
+        return gradient;
+    };
+    
+    // Create an array of gradients
+    const gradients = [
+        createGradient(ctx, 'rgba(29, 185, 84, 0.8)', 'rgba(29, 185, 84, 0.3)'),
+        createGradient(ctx, 'rgba(255, 99, 132, 0.8)', 'rgba(255, 99, 132, 0.3)'),
+        createGradient(ctx, 'rgba(54, 162, 235, 0.8)', 'rgba(54, 162, 235, 0.3)'),
+        createGradient(ctx, 'rgba(255, 206, 86, 0.8)', 'rgba(255, 206, 86, 0.3)'),
+        createGradient(ctx, 'rgba(153, 102, 255, 0.8)', 'rgba(153, 102, 255, 0.3)'),
+        createGradient(ctx, 'rgba(255, 159, 64, 0.8)', 'rgba(255, 159, 64, 0.3)'),
+        createGradient(ctx, 'rgba(75, 192, 192, 0.8)', 'rgba(75, 192, 192, 0.3)'),
+        createGradient(ctx, 'rgba(255, 99, 255, 0.8)', 'rgba(255, 99, 255, 0.3)'),
+        createGradient(ctx, 'rgba(99, 255, 132, 0.8)', 'rgba(99, 255, 132, 0.3)'),
+        createGradient(ctx, 'rgba(128, 128, 128, 0.8)', 'rgba(128, 128, 128, 0.3)')
+    ];
+    
+    // Static colors as fallback if gradients don't work
+    const staticColors = [
+        'rgba(29, 185, 84, 0.8)',
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(54, 162, 235, 0.8)',
+        'rgba(255, 206, 86, 0.8)',
+        'rgba(153, 102, 255, 0.8)',
+        'rgba(255, 159, 64, 0.8)',
+        'rgba(75, 192, 192, 0.8)',
+        'rgba(255, 99, 255, 0.8)',
+        'rgba(99, 255, 132, 0.8)',
+        'rgba(128, 128, 128, 0.8)'
+    ];
+    
+    // Border colors
+    const borderColors = [
+        'rgba(29, 185, 84, 1)',
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(255, 99, 255, 1)',
+        'rgba(99, 255, 132, 1)',
+        'rgba(128, 128, 128, 1)'
+    ];
+    
+    // Chart configuration
+    const chartConfig = {
+        type: 'doughnut',
+        data: {
+            labels: genresData.labels,
+            datasets: [{
+                data: genresData.data,
+                backgroundColor: window.devicePixelRatio > 1 ? staticColors : gradients, // Use static colors for high DPI devices
+                borderColor: borderColors,
+                borderWidth: 2,
+                hoverOffset: 15,
+                borderRadius: 5,
+                hoverBorderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 2000,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#FFFFFF',
+                        font: {
+                            family: 'Montserrat',
+                            size: 12
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(25, 20, 20, 0.9)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold',
+                        family: 'Montserrat'
+                    },
+                    bodyFont: {
+                        size: 13,
+                        family: 'Montserrat'
+                    },
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.formattedValue;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((context.raw / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    console.log('Creating chart with config:', chartConfig);
+    
+    // Create the chart with error handling
+    try {
+        const genreChart = new Chart(ctx, chartConfig);
+        
+        // Add hover interaction to genre items
+        const genreItems = document.querySelectorAll('.genre-item');
+        genreItems.forEach((item, index) => {
+            item.addEventListener('mouseenter', () => {
+                // Get all segments in the chart
+                const segments = genreChart.getDatasetMeta(0).data;
+                
+                // Reset all segments to default
+                segments.forEach(segment => {
+                    segment.options.offset = 0;
+                    segment.options.hoverOffset = 15;
+                });
+                
+                // Highlight the corresponding segment
+                if (segments[index]) {
+                    segments[index].options.offset = 20;
+                    genreChart.update();
+                }
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                // Return all segments to default
+                const segments = genreChart.getDatasetMeta(0).data;
+                segments.forEach(segment => {
+                    segment.options.offset = 0;
+                });
+                genreChart.update();
+            });
+        });
+        
+        console.log('Chart created successfully');
+    } catch (error) {
+        console.error('Error creating chart:', error);
+        
+        // Create a simple fallback visualization
+        if (chartCanvas) {
+            const parent = chartCanvas.parentElement;
+            
+            // Add error message
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'alert alert-warning mt-3';
+            errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> We had trouble loading your chart. Please try refreshing the page.';
+            
+            // Create a simple visualization
+            const simpleViz = document.createElement('div');
+            simpleViz.className = 'd-flex flex-column gap-2 mt-3';
+            
+            if (genresData && genresData.labels) {
+                genresData.labels.forEach((label, i) => {
+                    const percentage = Math.round((genresData.data[i] / genresData.data.reduce((a, b) => a + b, 0)) * 100);
+                    
+                    const barContainer = document.createElement('div');
+                    barContainer.className = 'd-flex align-items-center mb-2';
+                    
+                    const labelElement = document.createElement('div');
+                    labelElement.className = 'me-2 text-light';
+                    labelElement.style.width = '80px';
+                    labelElement.textContent = label;
+                    
+                    const barWrap = document.createElement('div');
+                    barWrap.className = 'flex-grow-1 bg-dark rounded-pill overflow-hidden';
+                    barWrap.style.height = '10px';
+                    
+                    const bar = document.createElement('div');
+                    bar.className = 'h-100 rounded-pill';
+                    bar.style.width = `${percentage}%`;
+                    bar.style.background = staticColors[i % staticColors.length];
+                    
+                    const percentText = document.createElement('div');
+                    percentText.className = 'ms-2 text-light';
+                    percentText.textContent = `${percentage}%`;
+                    
+                    barWrap.appendChild(bar);
+                    barContainer.appendChild(labelElement);
+                    barContainer.appendChild(barWrap);
+                    barContainer.appendChild(percentText);
+                    
+                    simpleViz.appendChild(barContainer);
+                });
+            }
+            
+            // Replace canvas with error message and simple visualization
+            parent.innerHTML = '';
+            parent.appendChild(errorMsg);
+            parent.appendChild(simpleViz);
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,629 @@
+{% extends 'base.html' %}
+
+{% block title %}Public Music Trends - Spotify Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .trends-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header {
+        position: relative;
+        margin-bottom: 3.5rem;
+        text-align: center;
+        padding: 3rem 0;
+        overflow: hidden;
+        border-radius: 20px;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.2) 0%, rgba(54, 162, 235, 0.2) 100%);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        z-index: -1;
+    }
+    
+    .page-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    
+    .artist-card, .track-card {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        height: 260px;
+        transition: all 0.4s ease;
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+    }
+    
+    .artist-card:hover, .track-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        border-color: rgba(29, 185, 84, 0.3);
+    }
+    
+    .artist-image, .track-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .artist-overlay, .track-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(0deg, rgba(25,20,20,0.95) 0%, rgba(25,20,20,0.8) 50%, rgba(25,20,20,0) 100%);
+        padding: 2.5rem 1.5rem 1.5rem;
+        transform: translateY(10px);
+        opacity: 0.9;
+        transition: all 0.3s ease;
+    }
+    
+    .artist-card:hover .artist-overlay, .track-card:hover .track-overlay {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .artist-card:hover .artist-image, .track-card:hover .track-image {
+        transform: scale(1.08);
+    }
+    
+    .chart-container {
+        height: 400px;
+        background: var(--glass-bg);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+    }
+    
+    .chart-container:hover {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        border-color: rgba(29, 185, 84, 0.2);
+    }
+    
+    .section-container {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .section-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+        z-index: -1;
+    }
+    
+    .time-range-selector {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--light);
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .time-range-selector:hover, 
+    .time-range-selector:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+        outline: none;
+    }
+    
+    .badge-trending {
+        background: linear-gradient(135deg, #1DB954, #1aa34a);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 3px 10px rgba(29, 185, 84, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    .play-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #1DB954, #1aa34a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(29, 185, 84, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .play-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(145deg, transparent, rgba(255, 255, 255, 0.2));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .play-button:hover {
+        transform: scale(1.15) rotate(5deg);
+        box-shadow: 0 6px 15px rgba(29, 185, 84, 0.5);
+    }
+    
+    .play-button:hover::before {
+        opacity: 1;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, rgba(25, 20, 20, 0.7) 0%, rgba(35, 30, 30, 0.7) 100%);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        margin-top: 4rem;
+    }
+    
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(29, 185, 84, 0.1) 0%, transparent 70%);
+        z-index: 0;
+    }
+    
+    .cta-section > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stagger-item {
+        opacity: 0;
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="trends-container">
+    <!-- Header Section -->
+    <header class="page-header animate-in">
+        <h1 class="page-title">Global Music Trends</h1>
+        <p class="fs-5 mb-0 text-light opacity-75">Discover what's trending in the world of music right now</p>
+    </header>
+
+    <!-- Trending Artists Section -->
+    <section class="section-container animate-in" style="animation-delay: 0.1s;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">Trending Artists</h2>
+            <div>
+                <select class="time-range-selector" id="artistTimeRange" onchange="updateArtistTimeRange()">
+                    <option value="short_term">This Month</option>
+                    <option value="medium_term" selected>Last 6 Months</option>
+                    <option value="long_term">All Time</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="row g-4" id="artistsContainer">
+            {% for artist in trending_artists %}
+            <div class="col-md-4 col-lg-4 stagger-item" style="animation-delay: {{ forloop.counter|add:"2" |floatformat:1 }}00ms">
+                <div class="artist-card">
+                    <img src="{{ artist.image_url }}" alt="{{ artist.name }}" class="artist-image" onerror="this.src='/static/images/placeholder-album.png'; this.onerror='';">
+                    <div class="artist-overlay">
+                        <h3 class="h5 mb-2">{{ artist.name }}</h3>
+                        <span class="badge badge-trending">
+                            <i class="fas fa-fire-flame-curved me-1"></i> Trending
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Trending Tracks Section -->
+    <section class="section-container animate-in" style="animation-delay: 0.2s;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">Top Tracks</h2>
+            <div>
+                <select class="time-range-selector" id="trackTimeRange" onchange="updateTrackTimeRange()">
+                    <option value="short_term">This Month</option>
+                    <option value="medium_term" selected>Last 6 Months</option>
+                    <option value="long_term">All Time</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="row g-4" id="tracksContainer">
+            {% for track in trending_tracks %}
+            <div class="col-md-4 col-lg-4 stagger-item" style="animation-delay: {{ forloop.counter|add:"5" |floatformat:1 }}00ms">
+                <div class="track-card">
+                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="track-image" onerror="this.src='/static/images/placeholder-album.png'; this.onerror='';">
+                    <div class="track-overlay">
+                        <h3 class="h5 mb-1">{{ track.name }}</h3>
+                        <p class="mb-3 text-secondary">{{ track.artist }}</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="play-button" onclick="playPreview('{{ track.preview_url }}', {{ forloop.counter }})">
+                                <i class="fas fa-play text-white" id="play-icon-{{ forloop.counter }}"></i>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2"><i class="fas fa-heart text-danger"></i> {{ track.popularity|default:"0" }}</span>
+                                <span><i class="fas fa-headphones text-primary"></i> {{ track.plays|default:"0" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Genre Distribution Section -->
+    <section class="animate-in" style="animation-delay: 0.3s;">
+        <h2 class="section-title mb-3">Genre Distribution</h2>
+        <p class="text-secondary mb-3">Most popular music genres based on current trends</p>
+        <div class="chart-container">
+            <canvas id="genreChart"></canvas>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section animate-in" style="animation-delay: 0.4s;">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="cta-title">Want to see your personal music insights?</h2>
+                <p class="mb-4 fs-5 text-light opacity-75">Connect your Spotify account to unlock personalized analytics and discover more about your unique music taste.</p>
+                <a href="{% url 'spotify_login' %}" class="btn btn-primary btn-lg">
+                    <i class="fab fa-spotify me-2"></i> Connect with Spotify
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Current audio playing
+    let currentAudio = null;
+    let currentPlayingId = null;
+    
+    // Function to play track preview with visual feedback
+    function playPreview(previewUrl, trackId) {
+        // Stop any currently playing audio
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            
+            // Reset previous play button icon
+            if (currentPlayingId) {
+                document.getElementById(`play-icon-${currentPlayingId}`).classList.remove('fa-pause');
+                document.getElementById(`play-icon-${currentPlayingId}`).classList.add('fa-play');
+            }
+        }
+        
+        // If same track is clicked again, just stop it
+        if (currentPlayingId === trackId) {
+            currentAudio = null;
+            currentPlayingId = null;
+            return;
+        }
+        
+        // If no preview URL, show a toast notification
+        if (!previewUrl) {
+            showToast('Preview not available for this track');
+            return;
+        }
+        
+        // Create and play new audio
+        currentAudio = new Audio(previewUrl);
+        currentPlayingId = trackId;
+        
+        // Update UI to show playing state
+        const playIcon = document.getElementById(`play-icon-${trackId}`);
+        playIcon.classList.remove('fa-play');
+        playIcon.classList.add('fa-pause');
+        
+        // Play the audio
+        currentAudio.play();
+        
+        // Reset when audio ends
+        currentAudio.onended = function() {
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play');
+            currentAudio = null;
+            currentPlayingId = null;
+        };
+    }
+    
+    // Function to show toast notification
+    function showToast(message) {
+        // Create toast element if it doesn't exist
+        if (!document.getElementById('toast-container')) {
+            const toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '1050';
+            document.body.appendChild(toastContainer);
+        }
+        
+        // Create unique ID for this toast
+        const toastId = 'toast-' + Date.now();
+        
+        // Create toast HTML
+        const toastHtml = `
+            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-dark text-light">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong class="me-auto">Spotify Analytics</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body bg-dark text-light">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        // Add toast to container
+        document.getElementById('toast-container').innerHTML += toastHtml;
+        
+        // Initialize and show the toast
+        const toastElement = document.getElementById(toastId);
+        const bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.remove();
+        });
+    }
+    
+    // Function to update artist time range
+    function updateArtistTimeRange() {
+        const timeRange = document.getElementById('artistTimeRange').value;
+        const rangeText = document.getElementById('artistTimeRange').options[document.getElementById('artistTimeRange').selectedIndex].text;
+        
+        // Here you would normally fetch data for the selected time range from your backend
+        // For demo purposes, we'll just show a notification
+        showToast(`Artist time range updated to: ${rangeText}`);
+        
+        // Add loading animation while "fetching" new data
+        const container = document.getElementById('artistsContainer');
+        container.classList.add('opacity-50');
+        
+        // Simulate loading delay
+        setTimeout(() => {
+            container.classList.remove('opacity-50');
+        }, 800);
+    }
+    
+    // Function to update track time range
+    function updateTrackTimeRange() {
+        const timeRange = document.getElementById('trackTimeRange').value;
+        const rangeText = document.getElementById('trackTimeRange').options[document.getElementById('trackTimeRange').selectedIndex].text;
+        
+        // Here you would normally fetch data for the selected time range from your backend
+        // For demo purposes, we'll just show a notification
+        showToast(`Track time range updated to: ${rangeText}`);
+        
+        // Add loading animation while "fetching" new data
+        const container = document.getElementById('tracksContainer');
+        container.classList.add('opacity-50');
+        
+        // Simulate loading delay
+        setTimeout(() => {
+            container.classList.remove('opacity-50');
+        }, 800);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Animate staggered items in
+        const staggerItems = document.querySelectorAll('.stagger-item');
+        staggerItems.forEach(item => {
+            item.classList.add('animate-in');
+        });
+        
+        // Genre distribution chart
+        var ctx = document.getElementById('genreChart').getContext('2d');
+        
+        // Create gradient for chart
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient1.addColorStop(0, 'rgba(29, 185, 84, 0.8)');
+        gradient1.addColorStop(1, 'rgba(29, 185, 84, 0.2)');
+        
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient2.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+        gradient2.addColorStop(1, 'rgba(54, 162, 235, 0.2)');
+        
+        const gradient3 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient3.addColorStop(0, 'rgba(255, 206, 86, 0.8)');
+        gradient3.addColorStop(1, 'rgba(255, 206, 86, 0.2)');
+        
+        const gradient4 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient4.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+        gradient4.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
+        
+        const gradient5 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient5.addColorStop(0, 'rgba(153, 102, 255, 0.8)');
+        gradient5.addColorStop(1, 'rgba(153, 102, 255, 0.2)');
+        
+        var genreChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for genre in trending_genres %}'{{ genre.name }}',{% endfor %}],
+                datasets: [{
+                    label: 'Popularity',
+                    data: [{% for genre in trending_genres %}{{ genre.count }},{% endfor %}],
+                    backgroundColor: [
+                        gradient1,
+                        gradient2,
+                        gradient3,
+                        gradient4,
+                        gradient5,
+                    ],
+                    borderColor: [
+                        'rgba(29, 185, 84, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(25, 20, 20, 0.9)',
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold',
+                            family: 'Montserrat'
+                        },
+                        bodyFont: {
+                            size: 13,
+                            family: 'Montserrat'
+                        },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#B3B3B3',
+                            font: {
+                                family: 'Montserrat'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#B3B3B3',
+                            font: {
+                                family: 'Montserrat'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Add hover effect to chart container
+        const chartContainer = document.querySelector('.chart-container');
+        chartContainer.addEventListener('mouseenter', () => {
+            genreChart.update();
+        });
+    });
+</script>
+{% endblock %}

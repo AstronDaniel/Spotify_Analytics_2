@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Spotify Analytics{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <h1 class="display-4 fw-bold mb-5">About Spotify Analytics</h1>
+        
+        <div class="row mb-5">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h2 class="section-title">Our Mission</h2>
+                <p class="mb-4">Spotify Analytics is dedicated to providing music enthusiasts with deep insights into their listening habits. We transform raw data from Spotify into meaningful visualizations and analytics that help users understand their musical tastes and discover new music.</p>
+                <p>Our platform combines modern data analytics with a user-friendly interface to make music analytics accessible and enjoyable for everyone, from casual listeners to music professionals.</p>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-4 h-100">
+                    <h3 class="h5 mb-3">Why We Built This</h3>
+                    <p class="mb-0">We believe music preferences reveal fascinating insights about ourselves and the world around us. By analyzing listening patterns, we can discover trends, understand emotion connections, and find hidden gems in the vast ocean of music available today.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title">How It Works</h2>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="card h-100 p-4 text-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-plug-circle-bolt text-white fa-2x"></i>
+                            </div>
+                            <h3 class="h5 mb-3">Connect</h3>
+                            <p class="mb-0">Securely connect your Spotify account through official OAuth authentication</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 p-4 text-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-database text-white fa-2x"></i>
+                            </div>
+                            <h3 class="h5 mb-3">Analyze</h3>
+                            <p class="mb-0">We process your listening data through our advanced analytics engine</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 p-4 text-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-chart-simple text-white fa-2x"></i>
+                            </div>
+                            <h3 class="h5 mb-3">Visualize</h3>
+                            <p class="mb-0">Explore interactive charts and detailed visualizations of your music preferences</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 p-4 text-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-lightbulb text-white fa-2x"></i>
+                            </div>
+                            <h3 class="h5 mb-3">Discover</h3>
+                            <p class="mb-0">Gain personalized insights and discover new music based on your taste</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title">Features</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-chart-pie fa-2x text-primary me-3"></i>
+                                <h3 class="h4 mb-0">Genre Analysis</h3>
+                            </div>
+                            <p class="mb-0">Discover how your music taste breaks down across different genres, with beautiful pie charts and distribution graphs.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-sliders fa-2x text-primary me-3"></i>
+                                <h3 class="h4 mb-0">Audio Features</h3>
+                            </div>
+                            <p class="mb-0">Analyze the technical aspects of your music like danceability, energy, valence, and tempo with detailed radar charts.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-clock-rotate-left fa-2x text-primary me-3"></i>
+                                <h3 class="h4 mb-0">Time Comparison</h3>
+                            </div>
+                            <p class="mb-0">Track how your music preferences have evolved over time, from recent favorites to all-time classics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title">Privacy & Security</h2>
+                <div class="card p-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <h3 class="h5 mb-3">Your Data is Safe</h3>
+                            <p class="mb-0">We take your privacy seriously. We only request read-only access to your Spotify data and never store your personal information on our servers. All analysis is performed in real-time, and your data is never shared with third parties.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h5 mb-3">Secure Authentication</h3>
+                            <p class="mb-0">We use Spotify's official OAuth 2.0 authentication process, which means we never see or store your Spotify password. You can revoke access at any time through your Spotify account settings.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="h3 mb-4">Ready to Explore Your Music DNA?</h2>
+                <a href="{% url 'spotify_login' %}" class="btn btn-primary btn-lg px-5">
+                    <i class="fab fa-spotify me-2"></i>Connect with Spotify
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

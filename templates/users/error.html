@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_rate_limit %}
+        Rate Limit Reached - Spotify Analytics
+    {% else %}
+        Service Unavailable - Spotify Analytics
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-5 mb-5 text-center">
+            <div class="mb-4">
+                {% if is_rate_limit %}
+                    <i class="fas fa-clock text-warning fa-4x mb-4"></i>
+                    <h1 class="h3 mb-3">Rate Limit Reached</h1>
+                    <p class="text-secondary mb-4">We've reached Spotify's API rate limit. This happens when too many requests are made in a short period.</p>
+                {% else %}
+                    <i class="fas fa-exclamation-triangle text-warning fa-4x mb-4"></i>
+                    <h1 class="h3 mb-3">Service Temporarily Unavailable</h1>
+                    <p class="text-secondary mb-4">We're having trouble connecting to Spotify's servers. This is likely a temporary issue with their service.</p>
+                {% endif %}
+            </div>
+            
+            <div class="alert alert-info mb-4">
+                <h4 class="h6 mb-2">What's happening?</h4>
+                {% if is_rate_limit %}
+                    <p class="mb-0">Spotify limits the number of API requests that can be made in a short time. We've reached that limit. This is a temporary situation and will resolve automatically.</p>
+                {% else %}
+                    <p class="mb-0">Spotify's authentication service is returning a {{ error_code }} error, which means their servers are currently not responding properly. This is not an issue with your account or our application.</p>
+                {% endif %}
+            </div>
+            
+            <div class="mb-4">
+                <h4 class="h6 mb-2">What can you do?</h4>
+                <ul class="list-unstyled">
+                    {% if is_rate_limit %}
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2"></i> Wait a few minutes (usually 1-2 minutes) before trying again
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-users me-2"></i> Try again during off-peak hours
+                        </li>
+                    {% else %}
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2"></i> Wait a few minutes and try again
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-sync-alt me-2"></i> Refresh the page
+                        </li>
+                    {% endif %}
+                    <li>
+                        <i class="fas fa-home me-2"></i> Return to the home page and try later
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="d-grid">
+                <a href="{% url 'home' %}" class="btn btn-primary py-3">
+                    <i class="fas fa-home me-2"></i> Return to Home
+                </a>
+            </div>
+        </div>
+        
+        <div class="card p-4">
+            <h3 class="h5 mb-3">While you wait...</h3>
+            <p class="mb-3">You can still explore some of our public data and trends without connecting to Spotify:</p>
+            <div class="d-grid">
+                <a href="{% url 'public_trends' %}" class="btn btn-outline-light">
+                    <i class="fas fa-chart-line me-2"></i> Explore Public Trends
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

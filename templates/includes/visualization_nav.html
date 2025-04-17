@@ -1,0 +1,101 @@
+<div class="viz-nav">
+    <div class="viz-nav-section mb-4">
+        <h5 class="d-flex align-items-center px-3 mb-3 fw-bold">
+            <i class="fas fa-chart-pie me-2 text-primary"></i>Visualizations
+        </h5>
+        <div class="viz-nav-links">
+            <a href="{% url 'genre_distribution' %}" class="viz-nav-link {% if request.resolver_match.url_name == 'genre_distribution' %}active{% endif %}">
+                <i class="fas fa-record-vinyl me-2"></i> Genre Distribution
+            </a>
+            <a href="{% url 'audio_features' %}" class="viz-nav-link {% if request.resolver_match.url_name == 'audio_features' %}active{% endif %}">
+                <i class="fas fa-sliders me-2"></i> Audio Features
+            </a>
+            <a href="{% url 'time_comparison' %}" class="viz-nav-link {% if request.resolver_match.url_name == 'time_comparison' %}active{% endif %}">
+                <i class="fas fa-clock-rotate-left me-2"></i> Time Comparison
+            </a>
+            <a href="{% url 'export_data' %}" class="viz-nav-link {% if request.resolver_match.url_name == 'export_data' %}active{% endif %}">
+                <i class="fas fa-file-export me-2"></i> Export Data
+            </a>
+        </div>
+    </div>
+
+    <div class="viz-nav-section">
+        <h5 class="d-flex align-items-center px-3 mb-3 fw-bold">
+            <i class="fas fa-chart-line me-2 text-primary"></i>Analytics
+        </h5>
+        <div class="viz-nav-links">
+            <a href="{% url 'dashboard' %}" class="viz-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line me-2"></i> Dashboard
+            </a>
+            <a href="{% url 'personal_insights' %}" class="viz-nav-link {% if request.resolver_match.url_name == 'personal_insights' %}active{% endif %}">
+                <i class="fas fa-lightbulb me-2"></i> Personal Insights
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .viz-nav-section {
+        position: relative;
+    }
+    
+    .viz-nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .viz-nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        color: var(--light);
+        text-decoration: none;
+        transition: all 0.25s ease;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .viz-nav-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(29, 185, 84, 0.1), transparent);
+        transition: width 0.3s ease;
+        z-index: -1;
+    }
+    
+    .viz-nav-link:hover::before,
+    .viz-nav-link.active::before {
+        width: 100%;
+    }
+    
+    .viz-nav-link:hover,
+    .viz-nav-link.active {
+        color: var(--primary);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(29, 185, 84, 0.2);
+        transform: translateX(5px);
+    }
+    
+    .viz-nav-link.active {
+        border-color: rgba(29, 185, 84, 0.3);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .viz-nav-link i {
+        transition: transform 0.3s ease;
+    }
+    
+    .viz-nav-link:hover i,
+    .viz-nav-link.active i {
+        transform: scale(1.2);
+    }
+</style>

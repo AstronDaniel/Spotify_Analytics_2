@@ -1,0 +1,883 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Spotify Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass-bg: rgba(25, 20, 20, 0.4);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --hover-transform: translateY(-6px);
+        --transition-speed: 0.35s;
+    }
+    
+    .dashboard-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .dashboard-container::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle at 20% 35%, rgba(29, 185, 84, 0.25) 0%, transparent 25%), 
+                          radial-gradient(circle at 75% 70%, rgba(54, 162, 235, 0.15) 0%, transparent 20%);
+        filter: blur(90px);
+        z-index: -1;
+    }
+    
+    .glass-card {
+        background: var(--glass-bg);
+        border-radius: 16px;
+        box-shadow: var(--glass-shadow);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        overflow: hidden;
+    }
+    
+    .glass-card:hover {
+        transform: var(--hover-transform);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .user-info-card {
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.85) 0%, rgba(26, 163, 74, 0.85) 100%);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .user-info-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        z-index: 0;
+    }
+    
+    .user-info-card > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .track-item {
+        background: var(--glass-bg);
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all var(--transition-speed) ease;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+    
+    .track-item:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        border-color: rgba(29, 185, 84, 0.3);
+    }
+    
+    .track-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .artist-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.5s ease, box-shadow 0.5s ease;
+    }
+    
+    .artist-card:hover .artist-image {
+        transform: scale(1.05);
+        border-color: rgba(29, 185, 84, 0.5);
+        box-shadow: 0 8px 25px rgba(29, 185, 84, 0.35);
+    }
+    
+    .artist-card {
+        text-align: center;
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all var(--transition-speed) ease;
+    }
+    
+    .artist-card:hover {
+        transform: var(--hover-transform);
+        box-shadow: var(--glass-shadow);
+    }
+    
+    .play-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #1DB954, #1aa34a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(29, 185, 84, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .play-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(145deg, transparent, rgba(255, 255, 255, 0.2));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .play-button:hover {
+        transform: scale(1.15) rotate(5deg);
+        box-shadow: 0 6px 15px rgba(29, 185, 84, 0.5);
+    }
+    
+    .play-button:hover::before {
+        opacity: 1;
+    }
+    
+    .play-button i {
+        transition: transform 0.2s ease;
+    }
+    
+    .play-button:active i {
+        transform: scale(0.8);
+    }
+    
+    .dashboard-nav {
+        padding: 1rem;
+        border-radius: 16px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+    }
+    
+    .dashboard-nav .nav-link {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        color: var(--light);
+        transition: all 0.25s ease;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    .dashboard-nav .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(29, 185, 84, 0.1), transparent);
+        transition: width 0.3s ease;
+        z-index: -1;
+    }
+    
+    .dashboard-nav .nav-link:hover::before,
+    .dashboard-nav .nav-link.active::before {
+        width: 100%;
+    }
+    
+    .dashboard-nav .nav-link:hover,
+    .dashboard-nav .nav-link.active {
+        background-color: rgba(83, 83, 83, 0.3);
+        color: var(--primary);
+        transform: translateX(5px);
+    }
+    
+    .chart-container {
+        height: 320px;
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+    }
+    
+    .chart-container:hover {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        border-color: rgba(29, 185, 84, 0.2);
+    }
+    
+    .time-period-selector {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--light);
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .time-period-selector:hover, 
+    .time-period-selector:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+        outline: none;
+    }
+    
+    .progress {
+        height: 8px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(90deg, #1DB954, #1aa34a);
+        border-radius: 10px;
+        transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    
+    .section-heading {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-heading::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -8px;
+        width: 40px;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    
+    .section-heading:hover::after {
+        width: 100%;
+    }
+    
+    .badge {
+        padding: 0.5rem 0.85rem;
+        border-radius: 50px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    
+    .badge-genre {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--light);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .badge-genre:hover {
+        background: rgba(29, 185, 84, 0.15);
+        border-color: rgba(29, 185, 84, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .btn-action {
+        border-radius: 50px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.7s ease;
+        z-index: -1;
+    }
+    
+    .btn-action:hover::before {
+        left: 100%;
+    }
+    
+    .btn-outline-glow {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--light);
+    }
+    
+    .btn-outline-glow:hover {
+        border-color: var(--primary);
+        box-shadow: 0 0 15px rgba(29, 185, 84, 0.4);
+        color: var(--primary);
+    }
+    
+    .listening-stats {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .stagger-item {
+        opacity: 0;
+    }
+    
+    .audio-wave {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        gap: 3px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .track-item:hover .audio-wave {
+        opacity: 1;
+    }
+    
+    .audio-wave span {
+        display: block;
+        width: 2px;
+        height: 100%;
+        background-color: var(--primary);
+        border-radius: 2px;
+        animation: wave 1.5s infinite ease-in-out;
+    }
+    
+    .audio-wave span:nth-child(2) { animation-delay: 0.2s; }
+    .audio-wave span:nth-child(3) { animation-delay: 0.4s; }
+    .audio-wave span:nth-child(4) { animation-delay: 0.6s; }
+    .audio-wave span:nth-child(5) { animation-delay: 0.8s; }
+    
+    @keyframes wave {
+        0%, 100% { height: 30%; }
+        50% { height: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="row">
+        <!-- Dashboard Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="user-info-card p-4 rounded-4 text-white mb-4 shadow">
+                {% if user_profile.images and user_profile.images.0.url %}
+                <img src="{{ user_profile.images.0.url }}" alt="{{ user_profile.display_name }}" class="rounded-circle mb-3" width="80" height="80">
+                {% else %}
+                <div class="bg-dark rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-user fa-2x"></i>
+                </div>
+                {% endif %}
+                <h2 class="h5 mb-1">{{ user_profile.display_name }}</h2>
+                <p class="mb-0">
+                    <small>
+                        <i class="fas fa-user-check me-1"></i> Spotify Premium
+                    </small>
+                </p>
+            </div>
+            
+            <div class="dashboard-nav">
+                <h3 class="h6 text-uppercase mb-3 ms-3">Analytics</h3>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'dashboard' %}">
+                            <i class="fas fa-chart-line me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'personal_insights' %}">
+                            <i class="fas fa-lightbulb me-2"></i> Personal Insights
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'genre_distribution' %}">
+                            <i class="fas fa-chart-pie me-2"></i> Genre Distribution
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'audio_features' %}">
+                            <i class="fas fa-sliders me-2"></i> Audio Features
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'time_comparison' %}">
+                            <i class="fas fa-clock-rotate-left me-2"></i> Time Comparison
+                        </a>
+                    </li>
+                </ul>
+                
+                <h3 class="h6 text-uppercase mb-3 mt-4 ms-3">Other</h3>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'export_data' %}">
+                            <i class="fas fa-file-export me-2"></i> Export Data
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'settings' %}">
+                            <i class="fas fa-gear me-2"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div class="col-lg-9">
+            <h1 class="section-heading mb-4 animate-in">Your Music Dashboard</h1>
+            
+            <!-- Summary Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="glass-card p-4 h-100 animate-in" style="animation-delay: 0.1s;">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                                <i class="fas fa-headphones fa-2x text-primary"></i>
+                            </div>
+                            <h3 class="h5 mb-0">Listening Activity</h3>
+                        </div>
+                        <h4 class="listening-stats mb-3">{{ recently_played.items|length }}</h4>
+                        <p class="text-secondary mb-0">Songs played recently</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-4 h-100 animate-in" style="animation-delay: 0.2s;">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                                <i class="fas fa-music fa-2x text-primary"></i>
+                            </div>
+                            <h3 class="h5 mb-0">Top Genres</h3>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge badge-genre me-1">Pop</span>
+                            <span class="badge badge-genre me-1">Rock</span>
+                            <span class="badge badge-genre">Hip Hop</span>
+                        </div>
+                        <p class="text-secondary mb-0">Based on your listening history</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-4 h-100 animate-in" style="animation-delay: 0.3s;">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                                <i class="fas fa-chart-simple fa-2x text-primary"></i>
+                            </div>
+                            <h3 class="h5 mb-0">Audio Features</h3>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: 75%" id="energyProgressBar"></div>
+                        </div>
+                        <small class="d-block mb-3">Energetic (75%)</small>
+                        <p class="text-secondary mb-0">Your music is mostly upbeat and energetic</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Artists and Recent Tracks -->
+            <div class="row g-4">
+                <!-- Top Artists -->
+                <div class="col-lg-6">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 section-heading">Your Top Artists</h2>
+                        <select class="time-period-selector" id="artistTimeRange" onchange="updateArtistTimeRange()">
+                            <option value="short_term">Last Month</option>
+                            <option value="medium_term" selected>Last 6 Months</option>
+                            <option value="long_term">All Time</option>
+                        </select>
+                    </div>
+                    <div class="row g-4" id="topArtistsContainer">
+                        {% for artist in top_artists.items|slice:":6" %}
+                        <div class="col-md-6 stagger-item" style="animation-delay: {{ forloop.counter|add:"3" |floatformat:1 }}00ms">
+                            <div class="artist-card h-100">
+                                {% if artist.images %}
+                                <img src="{{ artist.images.0.url }}" alt="{{ artist.name }}" class="artist-image mb-3">
+                                {% else %}
+                                <div class="bg-dark rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user fa-3x"></i>
+                                </div>
+                                {% endif %}
+                                <h3 class="h5 mb-1">{{ artist.name }}</h3>
+                                <p class="text-secondary mb-0">
+                                    {% for genre in artist.genres|slice:":2" %}
+                                    <span class="badge badge-genre me-1">{{ genre }}</span>
+                                    {% endfor %}
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="{% url 'personal_insights' %}" class="btn btn-action btn-outline-glow">
+                            <i class="fas fa-eye me-2"></i> View All Artists
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Recent Tracks -->
+                <div class="col-lg-6">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 section-heading">Recently Played</h2>
+                        <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">More History</a>
+                    </div>
+                    <div class="tracks-list" id="recentTracksContainer">
+                        {% for item in recently_played.items|slice:":5" %}
+                        <div class="track-item p-3 d-flex align-items-center stagger-item" style="animation-delay: {{ forloop.counter|add:"8" |floatformat:1 }}00ms" id="track-{{ forloop.counter }}">
+                            {% if item.track.album.images %}
+                            <img src="{{ item.track.album.images.0.url }}" alt="{{ item.track.name }}" class="track-image me-3">
+                            {% else %}
+                            <div class="bg-dark me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 10px;">
+                                <i class="fas fa-music fa-lg"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h4 class="h6 mb-1">{{ item.track.name }}</h4>
+                                <p class="text-secondary mb-0">{{ item.track.artists.0.name }}</p>
+                            </div>
+                            <div class="audio-wave me-3 d-none" id="wave-{{ forloop.counter }}">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="play-button" onclick="playPreview('{{ item.track.preview_url }}', {{ forloop.counter }})">
+                                <i class="fas fa-play text-white" id="play-icon-{{ forloop.counter }}"></i>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="#" class="btn btn-action btn-outline-glow">
+                            <i class="fas fa-history me-2"></i> Full History
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Listen Time Chart -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 section-heading">Weekly Listening Activity</h2>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill dropdown-toggle" type="button" id="chartViewDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Line Chart
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="chartViewDropdown">
+                                <li><a class="dropdown-item active" href="#" onclick="changeChartType('line')">Line Chart</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="changeChartType('bar')">Bar Chart</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-container animate-in" style="animation-delay: 0.6s;">
+                        <canvas id="listenTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Current audio playing
+    let currentAudio = null;
+    let currentPlayingId = null;
+    
+    // Function to play track preview with visual feedback
+    function playPreview(previewUrl, trackId) {
+        // Stop any currently playing audio
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            
+            // Reset previous play button icon
+            if (currentPlayingId) {
+                document.getElementById(`play-icon-${currentPlayingId}`).classList.remove('fa-pause');
+                document.getElementById(`play-icon-${currentPlayingId}`).classList.add('fa-play');
+                document.getElementById(`wave-${currentPlayingId}`).classList.add('d-none');
+            }
+        }
+        
+        // If same track is clicked again, just stop it
+        if (currentPlayingId === trackId) {
+            currentAudio = null;
+            currentPlayingId = null;
+            return;
+        }
+        
+        // If no preview URL, show a toast notification
+        if (!previewUrl) {
+            showToast('Preview not available for this track');
+            return;
+        }
+        
+        // Create and play new audio
+        currentAudio = new Audio(previewUrl);
+        currentPlayingId = trackId;
+        
+        // Update UI to show playing state
+        const playIcon = document.getElementById(`play-icon-${trackId}`);
+        playIcon.classList.remove('fa-play');
+        playIcon.classList.add('fa-pause');
+        
+        // Show audio wave animation
+        document.getElementById(`wave-${trackId}`).classList.remove('d-none');
+        
+        // Play the audio
+        currentAudio.play();
+        
+        // Reset when audio ends
+        currentAudio.onended = function() {
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play');
+            document.getElementById(`wave-${trackId}`).classList.add('d-none');
+            currentAudio = null;
+            currentPlayingId = null;
+        };
+    }
+    
+    // Function to show toast notification
+    function showToast(message) {
+        // Create toast element if it doesn't exist
+        if (!document.getElementById('toast-container')) {
+            const toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '1050';
+            document.body.appendChild(toastContainer);
+        }
+        
+        // Create unique ID for this toast
+        const toastId = 'toast-' + Date.now();
+        
+        // Create toast HTML
+        const toastHtml = `
+            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-dark text-light">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong class="me-auto">Spotify Analytics</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body bg-dark text-light">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        // Add toast to container
+        document.getElementById('toast-container').innerHTML += toastHtml;
+        
+        // Initialize and show the toast
+        const toastElement = document.getElementById(toastId);
+        const bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.remove();
+        });
+    }
+    
+    // Function to update artist time range
+    function updateArtistTimeRange() {
+        const timeRange = document.getElementById('artistTimeRange').value;
+        // In a real implementation, this would fetch artists for the selected time range
+        // For now, we'll just show a notification
+        showToast(`Time range updated to: ${document.getElementById('artistTimeRange').options[document.getElementById('artistTimeRange').selectedIndex].text}`);
+    }
+    
+    // Function to change chart type
+    function changeChartType(type) {
+        if (listenTimeChart) {
+            listenTimeChart.config.type = type;
+            listenTimeChart.update();
+            
+            // Update dropdown button text
+            document.getElementById('chartViewDropdown').textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' Chart';
+            
+            // Update active state in dropdown
+            document.querySelectorAll('#chartViewDropdown + .dropdown-menu .dropdown-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`#chartViewDropdown + .dropdown-menu .dropdown-item[onclick="changeChartType('${type}')"]`).classList.add('active');
+        }
+    }
+    
+    // Initialize animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate staggered items in
+        const staggerItems = document.querySelectorAll('.stagger-item');
+        staggerItems.forEach(item => {
+            item.classList.add('animate-in');
+        });
+        
+        // Animate progress bar
+        setTimeout(() => {
+            const progressBar = document.getElementById('energyProgressBar');
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.width = '75%';
+            }, 300);
+        }, 500);
+        
+        // Initialize chart
+        initializeChart();
+    });
+    
+    // Global chart variable
+    let listenTimeChart;
+    
+    // Initialize listening activity chart
+    function initializeChart() {
+        const ctx = document.getElementById('listenTimeChart').getContext('2d');
+        
+        // Create gradient for chart
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(29, 185, 84, 0.6)');
+        gradient.addColorStop(1, 'rgba(29, 185, 84, 0.1)');
+        
+        listenTimeChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                datasets: [{
+                    label: 'Hours Listened',
+                    data: [2.5, 1.8, 2.1, 3.2, 4.5, 3.8, 2.9],
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(29, 185, 84, 1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: 'rgba(29, 185, 84, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#B3B3B3',
+                            callback: function(value) {
+                                return value + 'h';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#B3B3B3'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(25, 20, 20, 0.9)',
+                        bodyFont: {
+                            family: 'Montserrat'
+                        },
+                        titleFont: {
+                            family: 'Montserrat',
+                            weight: 'bold'
+                        },
+                        padding: 12,
+                        borderColor: 'rgba(29, 185, 84, 0.3)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + ' hours';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Personal Insights - Spotify Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .visualization-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header {
+        position: relative;
+        margin-bottom: 3rem;
+        padding: 2.5rem 0;
+        overflow: hidden;
+        border-radius: 20px;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(54, 162, 235, 0.15) 100%);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        z-index: -1;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    
+    .insight-card {
+        height: 100%;
+        transition: all 0.35s ease;
+    }
+    
+    .insight-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .insight-card .card-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .insight-card .icon-bg {
+        height: 60px;
+        width: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(29, 185, 84, 0.1);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .insight-card:hover .icon-bg {
+        background: rgba(29, 185, 84, 0.2);
+        transform: scale(1.1);
+    }
+    
+    .insight-card .icon-bg i {
+        font-size: 1.8rem;
+        color: var(--primary);
+    }
+    
+    .highlight {
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+    }
+    
+    .time-period-selector {
+        background: var(--glass-bg);
+        border-radius: 50px;
+        padding: 0.5rem;
+        display: inline-flex;
+        margin-bottom: 2rem;
+        border: 1px solid var(--glass-border);
+    }
+    
+    .time-period-selector .btn {
+        border-radius: 50px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 600;
+        margin: 0 0.25rem;
+        background: transparent;
+        color: var(--light);
+        border: none;
+    }
+    
+    .time-period-selector .btn.active {
+        background: linear-gradient(135deg, #1DB954, #64D2AD);
+        color: white;
+        box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="visualization-container animate-in">
+    <div class="page-header mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="page-title">Personal Insights</h1>
+                    <p class="lead text-light">Discover unique patterns and trends in your listening habits.</p>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <i class="fas fa-lightbulb fa-4x text-light opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Time period selector -->
+        <div class="text-center mb-5">
+            <div class="time-period-selector">
+                <button class="btn active" data-time-range="short_term">Last 4 Weeks</button>
+                <button class="btn" data-time-range="medium_term">Last 6 Months</button>
+                <button class="btn" data-time-range="long_term">All Time</button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Listening Schedule -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="glass-card insight-card">
+                    <div class="card-body p-4">
+                        <div class="icon-bg">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3 class="card-title">Listening Schedule</h3>
+                        <p class="card-text">You listen to music most frequently on <span class="highlight">Fridays</span> between <span class="highlight">6-8 PM</span>.</p>
+                        <p class="small text-muted mt-3">Based on your streaming activity over the last 4 weeks</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mood Analysis -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="glass-card insight-card">
+                    <div class="card-body p-4">
+                        <div class="icon-bg">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <h3 class="card-title">Mood Analysis</h3>
+                        <p class="card-text">Your playlist moods tend to be <span class="highlight">energetic</span> and <span class="highlight">upbeat</span> on weekends, shifting to <span class="highlight">calm</span> during weekdays.</p>
+                        <p class="small text-muted mt-3">Based on audio features analysis of your top tracks</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Artist Loyalty -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="glass-card insight-card">
+                    <div class="card-body p-4">
+                        <div class="icon-bg">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="card-title">Artist Loyalty</h3>
+                        <p class="card-text">You've listened to <span class="highlight">Taylor Swift</span> consistently for <span class="highlight">14 months</span>, your longest artist loyalty streak.</p>
+                        <p class="small text-muted mt-3">Comparing your top artists across different time periods</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Genre Evolution -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="glass-card insight-card">
+                    <div class="card-body p-4">
+                        <div class="icon-bg">
+                            <i class="fas fa-compact-disc"></i>
+                        </div>
+                        <h3 class="card-title">Genre Evolution</h3>
+                        <p class="card-text">Your interest in <span class="highlight">indie pop</span> has increased by <span class="highlight">35%</span> in the last 6 months.</p>
+                        <p class="small text-muted mt-3">Based on changes in your genre preferences over time</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Listening Diversity -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="glass-card insight-card">
+                    <div class="card-body p-4">
+                        <div class="icon-bg">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 class="card-title">Listening Diversity</h3>
+                        <p class="card-text">You've listened to artists from <span class="highlight">12 countries</span> and <span class="highlight">8 languages</span> in the past month.</p>
+                        <p class="small text-muted mt-3">Analysis of artist origins and track languages</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Discovery Rate -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="glass-card insight-card">
+                    <div class="card-body p-4">
+                        <div class="icon-bg">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <h3 class="card-title">Discovery Rate</h3>
+                        <p class="card-text">You discover about <span class="highlight">15 new artists</span> each month, putting you in the top <span class="highlight">20%</span> of music explorers.</p>
+                        <p class="small text-muted mt-3">Comparing your new artist discovery rate over time</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advanced Insights Section -->
+        <div class="mt-5 mb-4">
+            <h2 class="section-title">Advanced Insights</h2>
+            <p class="text-muted">Deeper analytics based on your long-term listening patterns</p>
+        </div>
+        
+        <div class="row">
+            <!-- Tempo Preferences -->
+            <div class="col-md-6 mb-4">
+                <div class="glass-card chart-container">
+                    <h3 class="h5 mb-4">Tempo Preferences Throughout the Day</h3>
+                    <div class="tempo-chart" style="height: 300px;">
+                        <!-- Placeholder for chart -->
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <p class="text-muted">Loading tempo preference chart...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Musical Compatibility -->
+            <div class="col-md-6 mb-4">
+                <div class="glass-card chart-container">
+                    <h3 class="h5 mb-4">Musical Compatibility with Friends</h3>
+                    <div class="compatibility-chart" style="height: 300px;">
+                        <!-- Placeholder for chart -->
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <p class="text-muted">Loading compatibility chart...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Time period selector functionality
+        const timeButtons = document.querySelectorAll('.time-period-selector .btn');
+        timeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                timeButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get the selected time range
+                const timeRange = this.getAttribute('data-time-range');
+                
+                // Here you would typically fetch new data based on the time range
+                // and update the insights cards and charts
+                console.log('Selected time range:', timeRange);
+                
+                // For demo purposes, let's just show a loading state
+                document.querySelectorAll('.highlight').forEach(el => {
+                    el.textContent = '...';
+                });
+                
+                // Simulate loading new data
+                setTimeout(() => {
+                    // Update card content based on selected time range
+                    updateInsightsData(timeRange);
+                }, 1000);
+            });
+        });
+        
+        function updateInsightsData(timeRange) {
+            // This function would normally fetch data from the server
+            // For demonstration, we'll use hardcoded values
+            
+            let data = {
+                short_term: {
+                    listenDay: 'Fridays',
+                    listenTime: '6-8 PM',
+                    artistName: 'Taylor Swift',
+                    artistMonths: '14 months',
+                    genreName: 'indie pop',
+                    genreIncrease: '35%',
+                    countryCount: '12 countries',
+                    languageCount: '8 languages',
+                    newArtists: '15 new artists',
+                    explorerPercent: '20%'
+                },
+                medium_term: {
+                    listenDay: 'Tuesdays',
+                    listenTime: '7-9 PM',
+                    artistName: 'The Weeknd',
+                    artistMonths: '10 months',
+                    genreName: 'R&B',
+                    genreIncrease: '28%',
+                    countryCount: '18 countries',
+                    languageCount: '10 languages',
+                    newArtists: '12 new artists',
+                    explorerPercent: '15%'
+                },
+                long_term: {
+                    listenDay: 'Saturdays',
+                    listenTime: '2-4 PM',
+                    artistName: 'Coldplay',
+                    artistMonths: '24 months',
+                    genreName: 'alt rock',
+                    genreIncrease: '42%',
+                    countryCount: '23 countries',
+                    languageCount: '14 languages',
+                    newArtists: '8 new artists',
+                    explorerPercent: '10%'
+                }
+            };
+            
+            // Get the data for the selected time range
+            const selectedData = data[timeRange];
+            
+            // Update the DOM with the new data
+            document.querySelector('.card-text:nth-of-type(1) .highlight:nth-of-type(1)').textContent = selectedData.listenDay;
+            document.querySelector('.card-text:nth-of-type(1) .highlight:nth-of-type(2)').textContent = selectedData.listenTime;
+            
+            document.querySelectorAll('.card-text')[2].querySelector('.highlight:nth-of-type(1)').textContent = selectedData.artistName;
+            document.querySelectorAll('.card-text')[2].querySelector('.highlight:nth-of-type(2)').textContent = selectedData.artistMonths;
+            
+            document.querySelectorAll('.card-text')[3].querySelector('.highlight:nth-of-type(1)').textContent = selectedData.genreName;
+            document.querySelectorAll('.card-text')[3].querySelector('.highlight:nth-of-type(2)').textContent = selectedData.genreIncrease;
+            
+            document.querySelectorAll('.card-text')[4].querySelector('.highlight:nth-of-type(1)').textContent = selectedData.countryCount;
+            document.querySelectorAll('.card-text')[4].querySelector('.highlight:nth-of-type(2)').textContent = selectedData.languageCount;
+            
+            document.querySelectorAll('.card-text')[5].querySelector('.highlight:nth-of-type(1)').textContent = selectedData.newArtists;
+            document.querySelectorAll('.card-text')[5].querySelector('.highlight:nth-of-type(2)').textContent = selectedData.explorerPercent;
+        }
+    });
+</script>
+{% endblock %}

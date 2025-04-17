@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Spotify Analytics{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-5 mb-5">
+            <div class="text-center mb-4">
+                <h1 class="h3 mb-3">Connect with Spotify</h1>
+                <p class="text-secondary mb-4">Connect your Spotify account to analyze your music preferences and discover insights about your listening habits.</p>
+            </div>
+            
+            <div class="d-grid">
+                <button id="spotify-connect-btn" class="btn btn-primary btn-lg py-3" onclick="connectSpotify()">
+                    <i class="fab fa-spotify me-2"></i> Connect with Spotify
+                </button>
+                <div id="loading-spinner" class="text-center mt-3 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-secondary">Connecting to Spotify...</p>
+                </div>
+                <div id="timeout-message" class="alert alert-warning mt-3 d-none">
+                    <p class="mb-1"><strong>Taking longer than expected?</strong></p>
+                    <p class="mb-2">Spotify's servers might be experiencing high traffic or temporary issues.</p>
+                    <div class="d-grid gap-2">
+                        <button onclick="retryConnection()" class="btn btn-sm btn-outline-primary">Try Again</button>
+                        <a href="{% url 'public_trends' %}" class="btn btn-sm btn-outline-secondary">Continue as Guest</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <div class="text-center">
+                    <p class="text-secondary mb-4">Or continue as a visitor with limited features</p>
+                    <a href="{% url 'public_trends' %}" class="btn btn-outline-light">
+                        <i class="fas fa-chart-line me-2"></i> Explore Public Trends
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card p-4">
+            <h3 class="h5 mb-3">Why connect with Spotify?</h3>
+            <ul class="list-unstyled mb-0">
+                <li class="d-flex mb-3">
+                    <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                    <div>
+                        <h4 class="h6 mb-1">Personalized Analysis</h4>
+                        <p class="text-secondary mb-0">Get insights based on your personal listening history</p>
+                    </div>
+                </li>
+                <li class="d-flex mb-3">
+                    <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                    <div>
+                        <h4 class="h6 mb-1">Time-Based Comparisons</h4>
+                        <p class="text-secondary mb-0">See how your music taste has evolved over time</p>
+                    </div>
+                </li>
+                <li class="d-flex mb-3">
+                    <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                    <div>
+                        <h4 class="h6 mb-1">Genre Distribution</h4>
+                        <p class="text-secondary mb-0">Visualize your favorite genres and music attributes</p>
+                    </div>
+                </li>
+                <li class="d-flex">
+                    <i class="fas fa-check-circle text-primary me-3 mt-1"></i>
+                    <div>
+                        <h4 class="h6 mb-1">Shareable Insights</h4>
+                        <p class="text-secondary mb-0">Export and share your personalized music analytics</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card p-4">
+            <h3 class="h5 mb-3">Privacy Notice</h3>
+            <p class="mb-0">We only request read-only access to your Spotify data. We will never modify your playlists or make changes to your account. Your data is only used to generate insights and is never shared with third parties. See our <a href="{% url 'privacy' %}" class="text-primary">Privacy Policy</a> for more details.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Keep track of connection attempts
+    let connectionAttempts = 0;
+    const MAX_ATTEMPTS = 3;
+    let connectionTimeout = null;
+    
+    function connectSpotify() {
+        // Increment attempts counter
+        connectionAttempts++;
+        
+        // Show loading spinner
+        document.getElementById('spotify-connect-btn').disabled = true;
+        document.getElementById('loading-spinner').classList.remove('d-none');
+        
+        // If we've had multiple attempts, show a different message
+        if (connectionAttempts > 1) {
+            document.getElementById('timeout-message').innerHTML = 
+                '<p class="mb-1"><strong>Retrying connection...</strong></p>' +
+                '<p class="mb-2">Spotify\'s servers might be experiencing issues. ' + 
+                'Attempt ' + connectionAttempts + ' of ' + MAX_ATTEMPTS + '.</p>';
+            document.getElementById('timeout-message').classList.remove('d-none');
+        } else {
+            // First attempt - hide any previous timeout messages
+            document.getElementById('timeout-message').classList.add('d-none');
+            
+            // Set a timeout to show an alternative message if it takes too long
+            connectionTimeout = setTimeout(function() {
+                document.getElementById('timeout-message').classList.remove('d-none');
+            }, 5000);  // 5 seconds
+        }
+        
+        // If we've reached max attempts, show a different message
+        if (connectionAttempts >= MAX_ATTEMPTS) {
+            document.getElementById('timeout-message').innerHTML = 
+                '<div class="alert alert-warning">' +
+                '<p class="mb-1"><strong>Connection issues detected</strong></p>' +
+                '<p class="mb-2">We\'re having trouble connecting to Spotify. This might be due to:</p>' +
+                '<ul class="mb-3">' +
+                '<li>Spotify\'s servers are experiencing high traffic</li>' +
+                '<li>Temporary maintenance on Spotify\'s side</li>' +
+                '<li>Network connectivity issues</li>' +
+                '</ul>' +
+                '<div class="d-grid gap-2">' +
+                '<a href="{% url "public_trends" %}" class="btn btn-sm btn-outline-primary">Continue as Guest</a>' +
+                '<button onclick="resetAndTryAgain()" class="btn btn-sm btn-outline-secondary">Reset & Try Again Later</button>' +
+                '</div>' +
+                '</div>';
+        }
+        
+        // Redirect to Spotify login
+        window.location.href = "{% url 'spotify_login' %}";
+    }
+    
+    function retryConnection() {
+        // Clear any existing timeout
+        if (connectionTimeout) {
+            clearTimeout(connectionTimeout);
+        }
+        
+        // Reset UI but keep the attempt counter
+        document.getElementById('timeout-message').classList.add('d-none');
+        
+        // Try again
+        connectSpotify();
+    }
+    
+    function resetAndTryAgain() {
+        // Complete reset of connection state
+        connectionAttempts = 0;
+        if (connectionTimeout) {
+            clearTimeout(connectionTimeout);
+        }
+        
+        // Reset UI
+        document.getElementById('spotify-connect-btn').disabled = false;
+        document.getElementById('loading-spinner').classList.add('d-none');
+        document.getElementById('timeout-message').classList.add('d-none');
+    }
+</script>
+{% endblock %} 
