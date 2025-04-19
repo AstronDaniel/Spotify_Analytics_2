@@ -622,14 +622,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Songs by Genre Section -->
+                    </div>                    <!-- Songs by Genre Section -->
                     <div class="glass-card fade-in-up delay-4">
                         <h2 class="glass-card-title">
                             <i class="fas fa-music me-2"></i> Songs by Genre
                         </h2>
-                        <p class="mb-3"><i class="fas fa-hand-point-up me-2"></i> Select a genre from the list above to discover your top tracks in that genre.</p>
+                        <p class="mb-3"><i class="fas fa-hand-point-up me-2"></i> Select a genre from the list above to see all your available songs in that genre.</p>
                         
                         <div id="genreSongsContainer" class="songs-container">
                             <div id="initialMessage" class="placeholder-message">
@@ -640,6 +638,10 @@
                             {% for genre, songs in songs_by_genre.items %}
                             <div id="songs-{{ genre|slugify }}" class="genre-songs d-none">
                                 {% if songs %}
+                                <div class="genre-song-count mb-3">
+                                    <span class="badge bg-success">{{ songs|length }} song{% if songs|length != 1 %}s{% endif %} in this genre</span>
+                                    <small class="text-muted ms-2">{% if songs|length > 5 %}Scroll down to see more{% endif %}</small>
+                                </div>
                                 {% for song in songs|slice:":15" %}
                                 <div class="song-card">
                                     {% if song.album.images %}
