@@ -15,49 +15,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <style>
-        :root {
-            --primary: #1DB954;
+    <style>        :root {
+            --primary: #1DB954; /* Spotify green */
             --primary-dark: #1aa34a;
+            --primary-light: #1ED760; /* Lighter Spotify green */
+            --primary-gradient: linear-gradient(90deg, #1DB954, #1ED760);
+            --spotify-black: #191414;
+            --spotify-gray: #121212;
+            --spotify-light-gray: #282828;
+            --spotify-white: #FFFFFF;
             --hover-transform: translateY(-5px);
             --transition-speed: 0.35s;
 
             /* Default to Light Theme Variables */
             --bg-color: #f8f9fa; /* Light background */
             --text-color: #212529; /* Dark text */
-            --card-bg: rgba(255, 255, 255, 0.7); /* Lighter glass */
-            --card-border: rgba(0, 0, 0, 0.1);
-            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --nav-bg: rgba(248, 249, 250, 0.8); /* Light nav */
-            --nav-border: rgba(0, 0, 0, 0.1);
-            --footer-bg: rgba(248, 249, 250, 0.9); /* Light footer */
+            --card-bg: rgba(255, 255, 255, 0.8); /* Lighter glass */
+            --card-border: rgba(29, 185, 84, 0.15);
+            --card-shadow: 0 8px 32px rgba(29, 185, 84, 0.1);
+            --nav-bg: rgba(248, 249, 250, 0.95); /* Light nav */
+            --nav-border: rgba(29, 185, 84, 0.2);
+            --footer-bg: rgba(248, 249, 250, 0.95); /* Light footer */
             --footer-text: #6c757d;
-            --btn-outline-bg: rgba(0, 0, 0, 0.02);
-            --btn-outline-border: rgba(0, 0, 0, 0.15);
+            --btn-outline-bg: rgba(29, 185, 84, 0.05);
+            --btn-outline-border: rgba(29, 185, 84, 0.2);
             --btn-outline-text: #212529;
-            --dropdown-bg: rgba(255, 255, 255, 0.9);
+            --dropdown-bg: rgba(255, 255, 255, 0.95);
             --dropdown-item-text: #212529;
             --dropdown-item-hover-bg: rgba(29, 185, 84, 0.1);
             --dropdown-item-hover-text: var(--primary);
             --alert-success-bg: rgba(29, 185, 84, 0.1);
             --alert-success-border: rgba(29, 185, 84, 0.2);
             --alert-success-text: #0f5132;
-            --bg-gradient-1: rgba(29, 185, 84, 0.08); /* Lighter gradient */
-            --bg-gradient-2: rgba(54, 162, 235, 0.05);
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #191414; /* Dark background */
+            --bg-gradient-1: rgba(29, 185, 84, 0.1);
+            --bg-gradient-2: rgba(30, 215, 96, 0.08);
+        }        [data-theme="dark"] {
+            --bg-color: #121212; /* Spotify dark background */
             --text-color: #FFFFFF; /* Light text */
-            --card-bg: rgba(25, 20, 20, 0.4); /* Darker glass */
-            --card-border: rgba(255, 255, 255, 0.1);
-            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --nav-bg: rgba(25, 20, 20, 0.7); /* Dark nav */
-            --nav-border: rgba(255, 255, 255, 0.1);
-            --footer-bg: rgba(25, 20, 20, 0.7); /* Dark footer */
-            --footer-text: #B3B3B3;
-            --btn-outline-bg: rgba(255, 255, 255, 0.05);
-            --btn-outline-border: rgba(255, 255, 255, 0.2);
+            --card-bg: rgba(40, 40, 40, 0.7); /* Spotify darker card */
+            --card-border: rgba(29, 185, 84, 0.2);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(18, 18, 18, 0.95); /* Dark nav with Spotify style */
+            --nav-border: rgba(29, 185, 84, 0.2);
+            --footer-bg: rgba(18, 18, 18, 0.95); /* Dark footer */
+            --footer-text: #b3b3b3; /* Spotify gray text */
+            --btn-outline-bg: rgba(29, 185, 84, 0.1);
+            --btn-outline-border: rgba(29, 185, 84, 0.3);
             --btn-outline-text: #FFFFFF;
             --dropdown-bg: rgba(25, 20, 20, 0.85);
             --dropdown-item-text: #FFFFFF;
@@ -67,20 +70,20 @@
             --alert-success-border: rgba(29, 185, 84, 0.3);
             --alert-success-text: #d4edda;
             --bg-gradient-1: rgba(29, 185, 84, 0.15); /* Original dark gradient */
-            --bg-gradient-2: rgba(54, 162, 235, 0.1);
-        }
-
-        body {
+            --bg-gradient-2: rgba(29, 185, 84, 0.1); /* Use subtle green instead of blue */
+        }        body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-color); /* Use theme variable */
-            color: var(--text-color); /* Use theme variable */
+            background-color: var(--bg-color);
+            color: var(--text-color);
             position: relative;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background-color var(--transition-speed), color var(--transition-speed); /* Smooth theme transition */
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            line-height: 1.6;
+            letter-spacing: 0.01em;
         }
 
-        /* Background gradient effect */
+        /* Enhanced background gradient effect - more Spotify-like */
         body::before {
             content: '';
             position: fixed;
@@ -88,59 +91,93 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: radial-gradient(circle at 20% 35%, var(--bg-gradient-1) 0%, transparent 25%), 
-                              radial-gradient(circle at 75% 70%, var(--bg-gradient-2) 0%, transparent 20%);
-            filter: blur(90px);
+            background-image: 
+                radial-gradient(circle at 15% 30%, var(--bg-gradient-1) 0%, transparent 25%), 
+                radial-gradient(circle at 85% 65%, var(--bg-gradient-2) 0%, transparent 30%);
+            filter: blur(120px);
+            opacity: 0.8;
             z-index: -1;
+            animation: subtle-shift 45s ease-in-out infinite alternate;
         }
-
-        /* Glass Morphism Cards (Applies to .glass-card and .card) */
+        
+        @keyframes subtle-shift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 3% 10%; }
+        }        /* Enhanced Glass Morphism Cards */
         .glass-card, .card {
-            background: var(--card-bg); /* Use theme variable */
-            border-radius: 16px;
-            box-shadow: var(--card-shadow); /* Use theme variable */
-            border: 1px solid var(--card-border); /* Use theme variable */
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--card-border);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed), border-color var(--transition-speed);
+            transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
             overflow: hidden;
-            color: var(--text-color); /* Ensure card text color follows theme */
+            color: var(--text-color);
+            position: relative;
         }
 
         .glass-card:hover, .card:hover {
             transform: var(--hover-transform);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); /* Keep hover shadow consistent or make theme-dependent */
-            border-color: rgba(29, 185, 84, 0.2); /* Example hover border */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(29, 185, 84, 0.3);
         }
-
-        /* Navbar */
+        
+        /* Add subtle green glow effect on hover */
+        .glass-card::after, .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(29, 185, 84, 0.12) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .glass-card:hover::after, .card:hover::after {
+            opacity: 1;
+        }        /* Enhanced Navbar */
         .navbar {
-            background-color: var(--nav-bg); /* Use theme variable */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            background-color: var(--nav-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 0.85rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
-            border-bottom: 1px solid var(--nav-border); /* Use theme variable */
+            border-bottom: 1px solid var(--nav-border);
             z-index: 1030;
         }
 
         .nav-link {
-            color: var(--text-color) !important; /* Use theme variable */
+            color: var(--text-color) !important;
             font-weight: 500;
-            margin: 0 0.5rem;
-            transition: all 0.2s ease;
+            margin: 0 0.35rem;
+            transition: all 0.25s ease;
             opacity: 0.9;
             position: relative;
             z-index: 1;
             border-radius: 6px;
-            padding: 0.5rem 1rem !important;
+            padding: 0.5rem 0.8rem !important;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        
+        .navbar-brand i {
+            color: var(--primary);
         }
 
         .nav-link:hover, .nav-link.active {
             color: var(--primary) !important;
             opacity: 1;
-            background-color: rgba(var(--primary), 0.1); /* Use primary color with alpha */
+            background-color: rgba(29, 185, 84, 0.1);
+            transform: translateY(-1px);
         }
 
         /* Dropdown Menus */
@@ -170,20 +207,43 @@
             background-color: var(--dropdown-item-hover-bg); /* Use theme variable */
             color: var(--dropdown-item-hover-text); /* Use theme variable */
             transform: translateX(3px);
+        }        /* Enhanced Buttons */
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.25);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #1ED760, #1DB954);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(29, 185, 84, 0.35);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(1px);
         }
 
         .btn-outline-light {
-            background: var(--btn-outline-bg); /* Use theme variable */
+            background: var(--btn-outline-bg);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid var(--btn-outline-border); /* Use theme variable */
-            color: var(--btn-outline-text); /* Use theme variable */
+            border: 1px solid var(--btn-outline-border);
+            color: var(--btn-outline-text);
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            font-weight: 500;
+            padding: 0.6rem 1.5rem;
         }
 
         .btn-outline-light:hover {
-            background: rgba(var(--primary), 0.1); /* Example hover */
-            border-color: rgba(var(--primary), 0.3);
-            color: var(--primary); /* Example hover text */
+            background: rgba(29, 185, 84, 0.15);
+            border-color: rgba(29, 185, 84, 0.35);
+            color: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
@@ -230,26 +290,26 @@
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             color: var(--primary); /* Make icon primary on hover */
-        }
-
+        }        /* Enhanced Section Titles */
         .section-title {
             font-weight: 700;
             position: relative;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             display: inline-block;
-            color: var(--text-color); /* Use theme variable */
+            color: var(--text-color);
+            padding-bottom: 0.75rem;
         }
 
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: 0;
             left: 0;
             height: 3px;
             width: 50px;
-            background-color: var(--primary);
+            background: var(--primary-gradient);
             border-radius: 3px;
-            transition: width 0.3s ease;
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .section-title:hover::after {
