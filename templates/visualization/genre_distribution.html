@@ -622,51 +622,118 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    <!-- Songs by Genre Section -->
+                    </div>                    <!-- Songs & Artists by Genre Section -->
                     <div class="glass-card fade-in-up delay-4">
                         <h2 class="glass-card-title">
-                            <i class="fas fa-music me-2"></i> Songs by Genre
+                            <i class="fas fa-music me-2"></i> Genre Content
                         </h2>
-                        <p class="mb-3"><i class="fas fa-hand-point-up me-2"></i> Select a genre from the list above to see all your available songs in that genre.</p>
+                        <p class="mb-3"><i class="fas fa-hand-point-up me-2"></i> Select a genre from the list above to explore songs and artists in that genre.</p>
                         
-                        <div id="genreSongsContainer" class="songs-container">
-                            <div id="initialMessage" class="placeholder-message">
-                                <i class="fas fa-hand-point-up fa-2x mb-3"></i>
-                                <p>Click on a genre in the list above to see your songs in that genre.</p>
+                        <!-- Tab Navigation -->
+                        <ul class="nav nav-pills mb-3 genre-content-tabs" id="genreContentTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="songs-tab" data-bs-toggle="pill" data-bs-target="#songs-content" type="button" role="tab" aria-controls="songs-content" aria-selected="true">
+                                    <i class="fas fa-music me-2"></i>Songs
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="artists-tab" data-bs-toggle="pill" data-bs-target="#artists-content" type="button" role="tab" aria-controls="artists-content" aria-selected="false">
+                                    <i class="fas fa-user-music me-2"></i>Artists
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="genreContentTabContent">
+                            <!-- Songs Tab -->
+                            <div class="tab-pane fade show active" id="songs-content" role="tabpanel" aria-labelledby="songs-tab">
+                                <div id="genreSongsContainer" class="songs-container">
+                                    <div id="initialMessage" class="placeholder-message">
+                                        <i class="fas fa-hand-point-up fa-2x mb-3"></i>
+                                        <p>Click on a genre in the list above to see songs and artists in that genre.</p>
+                                    </div>
+                                    
+                                    {% for genre, songs in songs_by_genre.items %}
+                                    <div id="songs-{{ genre|slugify }}" class="genre-songs d-none">
+                                        {% if songs %}
+                                        <div class="genre-song-count mb-3">
+                                            <span class="badge bg-success">{{ songs|length }} song{% if songs|length != 1 %}s{% endif %} in this genre</span>
+                                            <small class="text-muted ms-2">{% if songs|length > 5 %}Scroll down to see more{% endif %}</small>
+                                        </div>
+                                        {% for song in songs|slice:":15" %}
+                                        <div class="song-card">
+                                            {% if song.album.images %}
+                                            <img src="{{ song.album.images.0.url }}" alt="{{ song.name }}" class="song-img">
+                                            {% else %}
+                                            <div class="song-img d-flex align-items-center justify-content-center bg-dark">
+                                                <i class="fas fa-music"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div class="song-details">
+                                                <div class="song-name">{{ song.name }}</div>
+                                                <div class="song-artist">{{ song.artists.0.name }}</div>
+                                            </div>
+                                            <a href="{{ song.external_urls.spotify }}" target="_blank" class="song-action">
+                                                <i class="fas fa-play"></i>
+                                            </a>
+                                        </div>
+                                        {% endfor %}
+                                        {% else %}
+                                        <div class="placeholder-message">
+                                            <p>We couldn't find any songs in your library for this genre.</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
                             
-                            {% for genre, songs in songs_by_genre.items %}
-                            <div id="songs-{{ genre|slugify }}" class="genre-songs d-none">
-                                {% if songs %}
-                                <div class="genre-song-count mb-3">
-                                    <span class="badge bg-success">{{ songs|length }} song{% if songs|length != 1 %}s{% endif %} in this genre</span>
-                                    <small class="text-muted ms-2">{% if songs|length > 5 %}Scroll down to see more{% endif %}</small>
-                                </div>
-                                {% for song in songs|slice:":15" %}
-                                <div class="song-card">
-                                    {% if song.album.images %}
-                                    <img src="{{ song.album.images.0.url }}" alt="{{ song.name }}" class="song-img">
-                                    {% else %}
-                                    <div class="song-img d-flex align-items-center justify-content-center bg-dark">
-                                        <i class="fas fa-music"></i>
+                            <!-- Artists Tab -->
+                            <div class="tab-pane fade" id="artists-content" role="tabpanel" aria-labelledby="artists-tab">
+                                <div id="genreArtistsContainer" class="artists-container">
+                                    <div id="initialArtistsMessage" class="placeholder-message">
+                                        <i class="fas fa-hand-point-up fa-2x mb-3"></i>
+                                        <p>Click on a genre in the list above to see artists in that genre.</p>
                                     </div>
-                                    {% endif %}
-                                    <div class="song-details">
-                                        <div class="song-name">{{ song.name }}</div>
-                                        <div class="song-artist">{{ song.artists.0.name }}</div>
+                                    
+                                    {% for genre, artists in artists_by_genre.items %}
+                                    <div id="artists-{{ genre|slugify }}" class="genre-artists d-none">
+                                        {% if artists %}
+                                        <div class="genre-artist-count mb-3">
+                                            <span class="badge bg-success">{{ artists|length }} artist{% if artists|length != 1 %}s{% endif %} in this genre</span>
+                                            <small class="text-muted ms-2">{% if artists|length > 5 %}Scroll down to see more{% endif %}</small>
+                                        </div>
+                                        <div class="artist-grid">
+                                            {% for artist in artists|slice:":20" %}
+                                            <div class="artist-card">
+                                                {% if artist.images %}
+                                                <img src="{{ artist.images.0.url }}" alt="{{ artist.name }}" class="artist-img">
+                                                {% else %}
+                                                <div class="artist-img-placeholder d-flex align-items-center justify-content-center bg-dark">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                {% endif %}
+                                                <div class="artist-details">
+                                                    <div class="artist-name">{{ artist.name }}</div>
+                                                    <div class="artist-popularity">
+                                                        <div class="popularity-bar" style="width: {{ artist.popularity }}%;"></div>
+                                                    </div>
+                                                </div>
+                                                <a href="{{ artist.external_urls.spotify }}" target="_blank" class="artist-action">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <div class="placeholder-message">
+                                            <p>We couldn't find any artists in your library for this genre.</p>
+                                        </div>
+                                        {% endif %}
                                     </div>
-                                    <a href="{{ song.external_urls.spotify }}" target="_blank" class="song-action">
-                                        <i class="fas fa-play"></i>
-                                    </a>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
-                                {% else %}
-                                <div class="placeholder-message">
-                                    <p>We couldn't find any songs in your library for this genre.</p>
-                                </div>
-                                {% endif %}
                             </div>
-                            {% endfor %}
                         </div>
                     </div>
 

@@ -122,6 +122,7 @@ def genre_distribution(request):
         'top_genres': top_genres,
         'genres_data': json.dumps(chart_data),
         'songs_by_genre': songs_by_genre,
+        'artists_by_genre': artist_by_genre,
         'primary_genre': primary_genre,
         'primary_genre_percentage': primary_genre_percentage,
         'diversity_level': diversity_level,
