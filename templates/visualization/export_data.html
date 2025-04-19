@@ -1,67 +1,78 @@
 ﻿{% extends 'base.html' %}
 
-{% block title %}Export Data - Coming Soon{% endblock %}
+{% block title %}Export Your Spotify Data{% endblock %}
 
 {% block extra_css %}
 <style>
-    .feature-card {
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(30, 30, 30, 0.5);
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        height: 100%;
+    .visualization-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header {
+        position: relative;
+        margin-bottom: 3rem;
+        padding: 2.5rem 0;
         overflow: hidden;
+        border-radius: 20px;
+        background: rgba(30, 30, 30, 0.3);
+        backdrop-filter: blur(10px);
     }
     
-    .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        border-color: rgba(29, 185, 84, 0.3);
-    }
-    
-    .feature-card .card-header {
-        background: linear-gradient(45deg, rgba(29, 185, 84, 0.15), rgba(30, 215, 96, 0.05));
-        border-bottom: 1px solid rgba(29, 185, 84, 0.2);
-    }
-    
-    .feature-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(45deg, #1DB954, #1ED760);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-        font-size: 24px;
-        color: white;
-    }
-    
-    .coming-soon-banner {
-        background: linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(54, 162, 235, 0.1));
-        border-radius: 12px;
-        padding: 2rem;
-        border: 1px solid rgba(29, 185, 84, 0.2);
-        margin-bottom: 2rem;
-    }
-    
-    .coming-soon-title {
+    .page-title {
         font-size: 2.5rem;
         font-weight: 800;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
         background: linear-gradient(90deg, #1DB954, #64D2AD);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         display: inline-block;
     }
     
-    .notification-form {
-        background: rgba(25, 25, 25, 0.5);
-        border-radius: 12px;
-        padding: 1.5rem;
+    .glass-card {
+        background: rgba(30, 30, 30, 0.5);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-top: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        border-color: rgba(29, 185, 84, 0.3);
+    }
+    
+    .export-card {
+        height: 100%;
+        padding: 0.5rem;
+    }
+    
+    .export-card .card-title {
+        color: white;
+        font-weight: 700;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .export-card .card-title i {
+        background: linear-gradient(45deg, #1DB954, #1ED760);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+    }
+    
+    .export-card .card-text {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
     }
     
     .format-badge {
@@ -71,140 +82,286 @@
         padding: 0.4rem 1rem;
         font-size: 0.85rem;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--light);
+        cursor: pointer;
+        transition: all 0.2s ease;
         margin-right: 0.5rem;
         margin-bottom: 0.5rem;
-        display: inline-block;
+    }
+    
+    .format-badge:hover {
+        background: rgba(29, 185, 84, 0.2);
+        border-color: rgba(29, 185, 84, 0.4);
+        color: #1DB954;
+    }
+    
+    .export-formats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .export-info {
+        margin-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 0.75rem;
+    }
+    
+    .export-info h6 {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0.5rem;
+    }
+    
+    .export-info ul {
+        padding-left: 1.2rem;
+        margin-bottom: 0;
+    }
+    
+    .export-info li {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0.25rem;
+    }
+    
+    .loading-spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(29, 185, 84, 0.3);
+        border-radius: 50%;
+        border-top-color: #1DB954;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Coming Soon Banner -->
-    <div class="coming-soon-banner text-center">
-        <h1 class="coming-soon-title">Data Export Coming Soon!</h1>
-        <p class="lead text-light opacity-75">We're working hard to bring you powerful data export capabilities</p>
-        <div class="mt-3">
-            <div class="badge bg-light text-dark rounded-pill px-3 py-2 fw-normal">
-                <i class="fas fa-hourglass-half me-2 text-primary"></i>Estimated release: May 2025
-            </div>
-        </div>
-    </div>
-    
-    <!-- Feature Cards -->
-    <div class="row mt-5">
-        <!-- Top Tracks Export -->
-        <div class="col-md-4 mb-4">
-            <div class="feature-card">
-                <div class="card-header py-3">
-                    <h5 class="mb-0 text-white"><i class="fas fa-music me-2"></i>Top Tracks</h5>
-                </div>
-                <div class="card-body">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h6 class="mb-3 text-white">Track Your Favorites</h6>
-                    <p class="text-muted">Export your most played tracks across different time ranges with detailed listening statistics and audio features.</p>
-                    
-                    <div class="mt-4">
-                        <p class="small text-light opacity-75">Available Formats:</p>
-                        <span class="format-badge"><i class="fas fa-file-csv me-1"></i>CSV</span>
-                        <span class="format-badge"><i class="fas fa-file-code me-1"></i>JSON</span>
-                        <span class="format-badge"><i class="fas fa-file-pdf me-1"></i>PDF</span>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <p class="small text-light opacity-75">Export Data Includes:</p>
-                        <ul class="text-muted small">
-                            <li>Track names and artists</li>
-                            <li>Play counts and popularity metrics</li>
-                            <li>Album information and release dates</li>
-                            <li>Detailed audio feature analysis</li>
-                        </ul>
-                    </div>
-                </div>
+<div class="visualization-container">
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="page-header text-center mb-5">
+            <div class="container py-4">
+                <h1 class="page-title">Export Your Spotify Data</h1>
+                <p class="lead text-light opacity-75">Download your listening data in various formats for personal analysis or sharing</p>
             </div>
         </div>
         
-        <!-- Audio Features Export -->
-        <div class="col-md-4 mb-4">
-            <div class="feature-card">
-                <div class="card-header py-3">
-                    <h5 class="mb-0 text-white"><i class="fas fa-sliders-h me-2"></i>Audio Features</h5>
-                </div>
-                <div class="card-body">
-                    <div class="feature-icon">
-                        <i class="fas fa-wave-square"></i>
-                    </div>
-                    <h6 class="mb-3 text-white">Analyze Your Music</h6>
-                    <p class="text-muted">Download detailed audio analysis of your music including danceability, energy, tempo, and more.</p>
-                    
-                    <div class="mt-4">
-                        <p class="small text-light opacity-75">Available Formats:</p>
-                        <span class="format-badge"><i class="fas fa-file-csv me-1"></i>CSV</span>
-                        <span class="format-badge"><i class="fas fa-file-code me-1"></i>JSON</span>
-                        <span class="format-badge"><i class="fas fa-file-excel me-1"></i>XLSX</span>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <p class="small text-light opacity-75">Export Data Includes:</p>
-                        <ul class="text-muted small">
-                            <li>Danceability and energy scores</li>
-                            <li>Tempo, key, and mode analysis</li>
-                            <li>Valence and acousticness metrics</li>
-                            <li>Instrumentalness and speechiness scores</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Genre Distribution Export -->
-        <div class="col-md-4 mb-4">
-            <div class="feature-card">
-                <div class="card-header py-3">
-                    <h5 class="mb-0 text-white"><i class="fas fa-chart-pie me-2"></i>Genre Distribution</h5>
-                </div>
-                <div class="card-body">
-                    <div class="feature-icon">
-                        <i class="fas fa-compact-disc"></i>
-                    </div>
-                    <h6 class="mb-3 text-white">Discover Your Taste</h6>
-                    <p class="text-muted">Get a breakdown of your listening habits by genre with detailed statistics and trends over time.</p>
-                    
-                    <div class="mt-4">
-                        <p class="small text-light opacity-75">Available Formats:</p>
-                        <span class="format-badge"><i class="fas fa-file-csv me-1"></i>CSV</span>
-                        <span class="format-badge"><i class="fas fa-file-code me-1"></i>JSON</span>
-                        <span class="format-badge"><i class="fas fa-chart-pie me-1"></i>SVG</span>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <p class="small text-light opacity-75">Export Data Includes:</p>
-                        <ul class="text-muted small">
-                            <li>Genre distribution percentages</li>
-                            <li>Top artists for each genre</li>
-                            <li>Listening trends over time</li>
-                            <li>Genre mood analysis</li>
-                        </ul>
+        <!-- Export Cards Section -->
+        <div class="row g-4">
+            <!-- Top Tracks Export -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card glass-card export-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-music"></i>Top Tracks</h5>
+                        <p class="card-text">Export your top tracks across different time ranges with details on popularity and listening frequency.</p>
+                        
+                        <div class="export-formats">
+                            <a href="{% url 'export_data' %}?type=top_tracks&format=csv" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </a>
+                            <a href="{% url 'export_data' %}?type=top_tracks&format=json" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-code me-1"></i>JSON
+                            </a>
+                            <a href="{% url 'export_data' %}?type=top_tracks&format=pdf" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </a>
+                        </div>
+                        
+                        <div class="export-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Export includes:</h6>
+                            <ul>
+                                <li>Track names and artists</li>
+                                <li>Play counts and popularity</li>
+                                <li>Album and release date</li>
+                                <li>Audio feature highlights</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Notification Form -->
-    <div class="notification-form text-center mt-5">
-        <h4 class="text-white mb-3">Get Notified When Export Features Launch</h4>
-        <p class="text-muted mb-4">Be the first to know when our export features are ready to use.</p>
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="input-group">
-                    <input type="email" class="form-control bg-dark text-light border-dark" placeholder="Your email address">
-                    <button class="btn btn-primary" type="button">Notify Me</button>
+            
+            <!-- Audio Features Export -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card glass-card export-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-sliders-h"></i>Audio Features</h5>
+                        <p class="card-text">Export detailed audio features of your music including danceability, energy, tempo and more.</p>
+                        
+                        <div class="export-formats">
+                            <a href="{% url 'export_data' %}?type=audio_features&format=csv" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </a>
+                            <a href="{% url 'export_data' %}?type=audio_features&format=json" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-code me-1"></i>JSON
+                            </a>
+                            <a href="{% url 'export_data' %}?type=audio_features&format=xlsx" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-excel me-1"></i>XLSX
+                            </a>
+                        </div>
+                        
+                        <div class="export-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Export includes:</h6>
+                            <ul>
+                                <li>Danceability and energy scores</li>
+                                <li>Tempo, key and mode analysis</li>
+                                <li>Valence and acousticness</li>
+                                <li>Instrumentalness metrics</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-text text-muted mt-2">We'll only email you about the export feature launch. No spam.</div>
+            </div>
+            
+            <!-- Genre Distribution Export -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card glass-card export-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-chart-pie"></i>Genre Distribution</h5>
+                        <p class="card-text">Export your genre distribution data showing your most listened to music genres and artists.</p>
+                        
+                        <div class="export-formats">
+                            <a href="{% url 'export_data' %}?type=genre_distribution&format=csv" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </a>
+                            <a href="{% url 'export_data' %}?type=genre_distribution&format=json" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-code me-1"></i>JSON
+                            </a>
+                            <a href="{% url 'export_data' %}?type=genre_distribution&format=svg" class="format-badge text-decoration-none">
+                                <i class="fas fa-chart-pie me-1"></i>SVG
+                            </a>
+                        </div>
+                        
+                        <div class="export-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Export includes:</h6>
+                            <ul>
+                                <li>Genre percentages</li>
+                                <li>Top artists by genre</li>
+                                <li>Listening history trends</li>
+                                <li>Mood analysis by genre</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recently Played Export -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card glass-card export-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-history"></i>Recently Played</h5>
+                        <p class="card-text">Export your recently played tracks with timestamps and listening patterns analysis.</p>
+                        
+                        <div class="export-formats">
+                            <a href="{% url 'export_data' %}?type=recently_played&format=csv" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </a>
+                            <a href="{% url 'export_data' %}?type=recently_played&format=json" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-code me-1"></i>JSON
+                            </a>
+                            <a href="{% url 'export_data' %}?type=recently_played&format=pdf" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </a>
+                        </div>
+                        
+                        <div class="export-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Export includes:</h6>
+                            <ul>
+                                <li>Track and artist details</li>
+                                <li>Precise timestamps</li>
+                                <li>Listening session analysis</li>
+                                <li>Time of day patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Artist Analysis Export -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card glass-card export-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-user-friends"></i>Artist Analysis</h5>
+                        <p class="card-text">Export data about your top artists including genre crossover and discovery dates.</p>
+                        
+                        <div class="export-formats">
+                            <a href="{% url 'export_data' %}?type=artist_analysis&format=csv" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </a>
+                            <a href="{% url 'export_data' %}?type=artist_analysis&format=json" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-code me-1"></i>JSON
+                            </a>
+                            <a href="{% url 'export_data' %}?type=artist_analysis&format=pdf" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </a>
+                        </div>
+                        
+                        <div class="export-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Export includes:</h6>
+                            <ul>
+                                <li>Artist popularity metrics</li>
+                                <li>Genre classification</li>
+                                <li>First listened dates</li>
+                                <li>Related artists network</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Playlist Export -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card glass-card export-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-list"></i>Playlists</h5>
+                        <p class="card-text">Export your playlists with track listings, creation dates, and collaborative status.</p>
+                        
+                        <div class="export-formats">
+                            <a href="{% url 'export_data' %}?type=playlists&format=csv" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </a>
+                            <a href="{% url 'export_data' %}?type=playlists&format=json" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-code me-1"></i>JSON
+                            </a>
+                            <a href="{% url 'export_data' %}?type=playlists&format=pdf" class="format-badge text-decoration-none">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </a>
+                        </div>
+                        
+                        <div class="export-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Export includes:</h6>
+                            <ul>
+                                <li>Complete track listings</li>
+                                <li>Playlist metadata</li>
+                                <li>Creation and edit dates</li>
+                                <li>Collaborative status</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info Alert -->
+            <div class="col-12 mt-2">
+                <div class="alert glass-card" style="background-color: rgba(25, 135, 84, 0.1); border-color: rgba(25, 135, 84, 0.2);">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-info-circle fa-2x text-success"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-white mb-2">About Data Exports</h5>
+                            <p class="mb-0 text-light opacity-75">Data exports include only information that Spotify provides through their API. Downloads may take a few moments to generate depending on the amount of data. All exports are protected with end-to-end encryption.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -214,26 +371,51 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle notification form submission
-        const notifyButton = document.querySelector('.notification-form button');
-        const emailInput = document.querySelector('.notification-form input');
+        // Get all format badges
+        const formatBadges = document.querySelectorAll('.format-badge');
         
-        if (notifyButton) {
-            notifyButton.addEventListener('click', function() {
-                if (emailInput.value.trim()) {
-                    // This would connect to a real backend in production
-                    alert('Thanks! We\'ll notify you when the export features launch.');
-                    emailInput.value = '';
-                } else {
-                    alert('Please enter a valid email address.');
-                }
+        // Add click handler to each badge
+        formatBadges.forEach(badge => {
+            badge.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the export type and format from the URL
+                const href = this.getAttribute('href');
+                const params = new URLSearchParams(href.substring(href.indexOf('?')));
+                const type = params.get('type');
+                const format = params.get('format');
+                
+                // Show loading state
+                const badgeText = this.innerHTML;
+                const spinner = document.createElement('span');
+                spinner.className = 'loading-spinner';
+                this.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>${format.toUpperCase()}`;
+                this.style.pointerEvents = 'none';
+                this.style.opacity = '0.7';
+                
+                // Simulate delay for better UX (can be removed in production)
+                setTimeout(() => {
+                    // Make the actual request
+                    window.location.href = href;
+                    
+                    // Reset the button after a short delay
+                    setTimeout(() => {
+                        this.innerHTML = badgeText;
+                        this.style.pointerEvents = 'auto';
+                        this.style.opacity = '1';
+                    }, 1000);
+                }, 500);
             });
-        }
+        });
         
-        // Add subtle animation to feature cards
-        const featureCards = document.querySelectorAll('.feature-card');
-        featureCards.forEach((card, index) => {
+        // Add animation to cards
+        const cards = document.querySelectorAll('.glass-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
             setTimeout(() => {
+                card.style.transition = 'all 0.4s ease';
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
             }, 100 * index);
