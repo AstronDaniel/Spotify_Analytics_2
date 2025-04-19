@@ -81,7 +81,8 @@
         -webkit-backdrop-filter: blur(15px);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        height: 100%;
+        min-height: 300px;
+       
         position: relative;
     }
     
@@ -293,58 +294,326 @@
         opacity: 0.18;
         width: 100% !important;
     }
-    
-    .time-label {
+      .time-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
         display: inline-block;
-        padding: 0.3rem 0.7rem;
+    }
+    
+    .time-indicator.short {
+        background: linear-gradient(135deg, #1DB954, #17a34a);
+        box-shadow: 0 0 8px rgba(29, 185, 84, 0.5);
+    }
+    
+    .time-indicator.medium {
+        background: linear-gradient(135deg, #4A90E2, #3a7bd5);
+        box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+    }
+    
+    .time-indicator.long {
+        background: linear-gradient(135deg, #9C27B0, #8e24aa);
+        box-shadow: 0 0 8px rgba(156, 39, 176, 0.5);
+    }
+    
+    .time-period-item {
+        padding: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.25s ease;
+    }
+    
+    .time-period-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateX(5px);
+    }
+    
+    .genre-tag {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.25s ease;
+    }
+    
+    .genre-tag:hover {
+        background: rgba(29, 185, 84, 0.1);
+        border-color: rgba(29, 185, 84, 0.2);
+        transform: translateX(5px);
+    }
+    
+    .genre-name {
+        font-size: 0.9rem;
         font-weight: 500;
+    }
+    
+    .genre-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: rgba(29, 185, 84, 0.2);
+        border-radius: 50%;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--spotify-green);
+    }
+    
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--spotify-green);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+    
+    .user-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 1.25rem;
+    }
+    
+    .track-card {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.25s ease;
+    }
+    
+    .track-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .track-rank {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-right: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.25s ease;
+    }
+    
+    .track-card:hover .track-rank {
+        transform: scale(1.15) rotate(5deg);
+        background: rgba(29, 185, 84, 0.2);
+        color: var(--spotify-green);
+    }
+    
+    .track-image {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-right: 0.75rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        transition: all 0.25s ease;
+    }
+    
+    .track-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .track-card:hover .track-image {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+    }
+    
+    .track-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+    
+    .track-details {
+        flex: 2;
+        min-width: 0;
+    }
+    
+    .track-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .track-artist {
         font-size: 0.8rem;
+        opacity: 0.7;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .track-album {
+        flex: 1;
+        font-size: 0.8rem;
+        opacity: 0.7;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0 0.75rem;
+        display: none;
+    }
+    
+    @media (min-width: 992px) {
+        .track-album {
+            display: block;
+        }
+    }
+    
+    .track-actions {
+        display: flex;
+        align-items: center;
+        min-width: 70px;
+    }
+    
+    .btn-play {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(29, 185, 84, 0.15);
+        color: var(--spotify-green);
+        border: none;
+        transition: all 0.25s ease;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-play:hover {
+        background: var(--spotify-green);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .btn-link {
+        color: var(--secondary);
+        transition: all 0.25s ease;
+    }
+    
+    .btn-link:hover {
+        color: var(--light);
+        transform: scale(1.1);
+    }
+    
+    .tracks-container {
+        max-height: 450px;
+        overflow-y: auto;
+        padding-right: 10px;
+        scrollbar-width: thin;
+    }
+    
+    .tracks-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .tracks-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .tracks-container::-webkit-scrollbar-thumb {
+        background: rgba(29, 185, 84, 0.3);
+        border-radius: 5px;
+    }
+    
+    .tracks-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(29, 185, 84, 0.5);
+    }
+    
+    .insights-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    
+    @media (min-width: 768px) {
+        .insights-section {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    .insight-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.25s ease;
+    }
+    
+    .insight-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .insight-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(29, 185, 84, 0.1);
+        color: var(--spotify-green);
+        font-size: 1.25rem;
+        transition: all 0.25s ease;
+    }
+    
+    .insight-card:hover .insight-icon {
+        transform: scale(1.15) rotate(5deg);
+        background: rgba(29, 185, 84, 0.2);
+    }
+    
+    .insight-content {
+        flex: 1;
+    }
+    
+    .insight-content h3 {
         margin-bottom: 0.5rem;
-        border: 1px solid transparent;
+        font-weight: 600;
     }
     
-    .time-label.short {
-        background-color: rgba(29, 185, 84, 0.15);
-        border-color: rgba(29, 185, 84, 0.3);
-        color: #1DB954;
-    }
-    
-    .time-label.medium {
-        background-color: rgba(74, 144, 226, 0.15);
-        border-color: rgba(74, 144, 226, 0.3);
-        color: #4A90E2;
-    }
-    
-    .time-label.long {
-        background-color: rgba(156, 39, 176, 0.15);
-        border-color: rgba(156, 39, 176, 0.3);
-        color: #9C27B0;
-    }
-    
-    .animate-in {
-        animation: fadeInUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-        opacity: 0;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(25px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    :root {
-        --chartColors-short-background: rgba(29, 185, 84, 0.8);
-        --chartColors-medium-background: rgba(74, 144, 226, 0.8);
-        --chartColors-long-background: rgba(156, 39, 176, 0.8);
-        --chartColors-short-border: #1DB954;
-        --chartColors-medium-border: #4A90E2;
-        --chartColors-long-border: #9C27B0;
+    .insight-content p {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+        opacity: 0.9;
     }
 </style>
 {% endblock %}
@@ -364,147 +633,436 @@
             <div class="col-lg-3 mb-4">
                 <div class="viz-side-menu animate-in" style="animation-delay: 0.1s;">
                     {% include 'includes/visualization_nav.html' %}
+                    
+                    <!-- User Profile Summary -->
+                    {% if user_profile %}
+                    <div class="user-profile-summary mt-4">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if user_profile.images and user_profile.images.0.url %}
+                            <img src="{{ user_profile.images.0.url }}" alt="{{ user_profile.display_name }}" class="user-avatar">
+                            {% else %}
+                            <div class="user-avatar-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% endif %}
+                            <div class="ms-3">
+                                <h3 class="h5 mb-1">{{ user_profile.display_name }}</h3>
+                                <p class="text-secondary mb-0 small">
+                                    <i class="fab fa-spotify me-1"></i> Spotify Account
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Comparison Type Toggle -->
+                    <div class="comparison-toggle mt-4">
+                        <h4 class="h6 mb-3">View Comparison</h4>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="comparisonType" id="artistsCompare" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="artistsCompare">
+                                <i class="fas fa-user-music me-1"></i> Artists
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="comparisonType" id="tracksCompare" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="tracksCompare">
+                                <i class="fas fa-music me-1"></i> Tracks
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Time Periods Info -->
+                    <div class="time-periods-info mt-4">
+                        <h4 class="h6 mb-3">Time Periods</h4>
+                        <div class="time-period-item mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="time-indicator short"></span>
+                                <span class="ms-2">Recent (4 weeks)</span>
+                            </div>
+                            <small class="text-secondary">Your latest favorites</small>
+                        </div>
+                        <div class="time-period-item mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="time-indicator medium"></span>
+                                <span class="ms-2">Medium (6 months)</span>
+                            </div>
+                            <small class="text-secondary">Your mid-term preferences</small>
+                        </div>
+                        <div class="time-period-item">
+                            <div class="d-flex align-items-center">
+                                <span class="time-indicator long"></span>
+                                <span class="ms-2">Long-term (years)</span>
+                            </div>
+                            <small class="text-secondary">Your all-time favorites</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Genre Consistency -->
+                    <div class="genre-consistency mt-4">
+                        <h4 class="h6 mb-3">Your Consistent Genres</h4>
+                        <ul class="list-unstyled">
+                            {% for genre, count in consistent_genres %}
+                            <li class="genre-tag mb-2">
+                                <span class="genre-name">{{ genre|title }}</span>
+                                <span class="genre-badge">{{ count }}</span>
+                            </li>
+                            {% empty %}
+                            <li class="text-secondary">No genre data available</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
             
             <!-- Main Content -->
             <div class="col-lg-9">
                 <!-- Similarity Scores -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-4">
-                        <div class="animate-in" style="animation-delay: 0.2s;">
-                            <div class="score-container short-term">
-                                <span class="time-label short">Recent to Mid-term</span>
-                                <div class="score-value">{{ similarity_short_medium|floatformat:0 }}%</div>
-                                <div class="score-label">Similarity</div>
-                                <div class="score-background" style="width: {{ similarity_short_medium }}%;"></div>
+                <div id="artistsSection">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="animate-in" style="animation-delay: 0.2s;">
+                                <div class="score-container short-term">
+                                    <span class="time-label short">Recent to Mid-term</span>
+                                    <div class="score-value">{{ similarity_short_medium|floatformat:0 }}%</div>
+                                    <div class="score-label">Similarity</div>
+                                    <div class="score-background" style="width: {{ similarity_short_medium }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="animate-in" style="animation-delay: 0.3s;">
+                                <div class="score-container medium-term">
+                                    <span class="time-label medium">Mid-term to Long-term</span>
+                                    <div class="score-value">{{ similarity_medium_long|floatformat:0 }}%</div>
+                                    <div class="score-label">Similarity</div>
+                                    <div class="score-background" style="width: {{ similarity_medium_long }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="animate-in" style="animation-delay: 0.4s;">
+                                <div class="score-container long-term">
+                                    <span class="time-label long">Recent to Long-term</span>
+                                    <div class="score-value">{{ similarity_short_long|floatformat:0 }}%</div>
+                                    <div class="score-label">Similarity</div>
+                                    <div class="score-background" style="width: {{ similarity_short_long }}%;"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="animate-in" style="animation-delay: 0.3s;">
-                            <div class="score-container medium-term">
-                                <span class="time-label medium">Mid-term to Long-term</span>
-                                <div class="score-value">{{ similarity_medium_long|floatformat:0 }}%</div>
-                                <div class="score-label">Similarity</div>
-                                <div class="score-background" style="width: {{ similarity_medium_long }}%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="animate-in" style="animation-delay: 0.4s;">
-                            <div class="score-container long-term">
-                                <span class="time-label long">Recent to Long-term</span>
-                                <div class="score-value">{{ similarity_short_long|floatformat:0 }}%</div>
-                                <div class="score-label">Similarity</div>
-                                <div class="score-background" style="width: {{ similarity_short_long }}%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Bar Chart -->
-                <div class="viz-card mb-5 animate-in" style="animation-delay: 0.5s;">
-                    <h2 class="section-heading">Artist Overlap</h2>
-                    <div class="chart-container">
-                        <canvas id="timeComparisonChart"></canvas>
-                    </div>
-                    <p class="mb-0 text-center text-secondary">This chart shows how your top artists appear across different time periods.</p>
-                </div>
-                
-                <!-- Top Artists Comparison Table -->
-                <div class="viz-card animate-in" style="animation-delay: 0.6s;">
-                    <h2 class="section-heading">Top Artists Comparison</h2>
-                    <div class="table-responsive">
-                        <table class="comparison-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 33%;">
-                                        <span class="time-label short">Recent (4 weeks)</span>
-                                    </th>
-                                    <th style="width: 33%;">
-                                        <span class="time-label medium">Mid-term (6 months)</span>
-                                    </th>
-                                    <th style="width: 33%;">
-                                        <span class="time-label long">Long-term (years)</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for i in top_artists_range %}
-                                <tr>
-                                    <td class="short-term">
-                                        {% if short_term_artists|length > i %}
-                                        <div class="d-flex align-items-center">
-                                            <div class="rank">{{ i|add:"1" }}</div>
-                                            <div class="ms-3">
-                                                <div class="artist-name">{{ short_term_artists.i.name }}</div>
-                                                <div class="artist-genres">
-                                                    {% for genre in short_term_artists.i.genres|slice:":2" %}
-                                                    {{ genre|title }}{% if not forloop.last %}, {% endif %}
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                    <td class="medium-term">
-                                        {% if medium_term_artists|length > i %}
-                                        <div class="d-flex align-items-center">
-                                            <div class="rank">{{ i|add:"1" }}</div>
-                                            <div class="ms-3">
-                                                <div class="artist-name">{{ medium_term_artists.i.name }}</div>
-                                                <div class="artist-genres">
-                                                    {% for genre in medium_term_artists.i.genres|slice:":2" %}
-                                                    {{ genre|title }}{% if not forloop.last %}, {% endif %}
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                    <td class="long-term">
-                                        {% if long_term_artists|length > i %}
-                                        <div class="d-flex align-items-center">
-                                            <div class="rank">{{ i|add:"1" }}</div>
-                                            <div class="ms-3">
-                                                <div class="artist-name">{{ long_term_artists.i.name }}</div>
-                                                <div class="artist-genres">
-                                                    {% for genre in long_term_artists.i.genres|slice:":2" %}
-                                                    {{ genre|title }}{% if not forloop.last %}, {% endif %}
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <!-- Artist Overlap Chart -->
+                    <div class="viz-card mb-5 animate-in" style="animation-delay: 0.5s;">
+                        <h2 class="section-heading">Artist Popularity Comparison</h2>
+                        <div class="chart-container">
+                            <canvas id="artistComparisonChart"></canvas>
+                        </div>
+                        <p class="mb-0 text-center text-secondary">This chart compares the popularity of your top artists across different time periods.</p>
                     </div>
                     
-                    <div class="mt-4">
-                        <h3 class="h5 mb-3">Time Comparison Insights</h3>
-                        <p>
-                            {% if similarity_short_medium > 70 %}
-                            Your recent listening habits are <span class="fw-bold text-success">very similar</span> to your mid-term preferences, showing consistency in your music taste over the past 6 months.
-                            {% elif similarity_short_medium > 40 %}
-                            Your recent listening habits show <span class="fw-bold text-primary">moderate changes</span> compared to your mid-term preferences, indicating evolving musical interests.
-                            {% else %}
-                            Your recent listening habits are <span class="fw-bold text-danger">significantly different</span> from your mid-term preferences, suggesting you're exploring new artists and genres.
-                            {% endif %}
-                        </p>
+                    <!-- Top Artists Comparison Table -->
+                    <div class="viz-card animate-in" style="animation-delay: 0.6s;">
+                        <h2 class="section-heading">Top Artists Comparison</h2>
+                        <div class="table-responsive">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 33%;">
+                                            <span class="time-label short">Recent (4 weeks)</span>
+                                        </th>
+                                        <th style="width: 33%;">
+                                            <span class="time-label medium">Mid-term (6 months)</span>
+                                        </th>
+                                        <th style="width: 33%;">
+                                            <span class="time-label long">Long-term (years)</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in top_artists_range %}
+                                    <tr>
+                                        <td class="short-term">
+                                            {% if short_term_artists|length > i %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="rank">{{ i|add:"1" }}</div>
+                                                <div class="ms-3">
+                                                    <div class="artist-name">{{ short_term_artists.i.name }}</div>
+                                                    <div class="artist-genres">
+                                                        {% for genre in short_term_artists.i.genres|slice:":2" %}
+                                                        {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td class="medium-term">
+                                            {% if medium_term_artists|length > i %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="rank">{{ i|add:"1" }}</div>
+                                                <div class="ms-3">
+                                                    <div class="artist-name">{{ medium_term_artists.i.name }}</div>
+                                                    <div class="artist-genres">
+                                                        {% for genre in medium_term_artists.i.genres|slice:":2" %}
+                                                        {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td class="long-term">
+                                            {% if long_term_artists|length > i %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="rank">{{ i|add:"1" }}</div>
+                                                <div class="ms-3">
+                                                    <div class="artist-name">{{ long_term_artists.i.name }}</div>
+                                                    <div class="artist-genres">
+                                                        {% for genre in long_term_artists.i.genres|slice:":2" %}
+                                                        {{ genre|title }}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tracks Comparison Section (Hidden by default) -->
+                <div id="tracksSection" style="display: none;">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="animate-in" style="animation-delay: 0.2s;">
+                                <div class="score-container short-term">
+                                    <span class="time-label short">Recent to Mid-term</span>
+                                    <div class="score-value">{{ track_similarity_short_medium|floatformat:0 }}%</div>
+                                    <div class="score-label">Similarity</div>
+                                    <div class="score-background" style="width: {{ track_similarity_short_medium }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="animate-in" style="animation-delay: 0.3s;">
+                                <div class="score-container medium-term">
+                                    <span class="time-label medium">Mid-term to Long-term</span>
+                                    <div class="score-value">{{ track_similarity_medium_long|floatformat:0 }}%</div>
+                                    <div class="score-label">Similarity</div>
+                                    <div class="score-background" style="width: {{ track_similarity_medium_long }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="animate-in" style="animation-delay: 0.4s;">
+                                <div class="score-container long-term">
+                                    <span class="time-label long">Recent to Long-term</span>
+                                    <div class="score-value">{{ track_similarity_short_long|floatformat:0 }}%</div>
+                                    <div class="score-label">Similarity</div>
+                                    <div class="score-background" style="width: {{ track_similarity_short_long }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Tracks Comparison -->
+                    <div class="viz-card animate-in" style="animation-delay: 0.5s;">
+                        <h2 class="section-heading">Top Tracks Comparison</h2>
                         
-                        <p>
-                            {% if similarity_short_long > 60 %}
-                            Your current favorites align closely with your long-term listening habits, showing a <span class="fw-bold text-success">strong dedication</span> to your core musical preferences.
-                            {% elif similarity_short_long > 30 %}
-                            There's <span class="fw-bold text-primary">some overlap</span> between your current and long-term musical preferences, with a healthy balance of new discoveries and old favorites.
-                            {% else %}
-                            Your current music taste has <span class="fw-bold text-danger">evolved significantly</span> from your long-term preferences, showing a journey of musical exploration and changing tastes.
-                            {% endif %}
-                        </p>
+                        <!-- Tracks Tabs -->
+                        <ul class="nav nav-tabs mb-4" id="tracksComparisonTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="recent-tab" data-bs-toggle="tab" data-bs-target="#recent-tracks" type="button" role="tab" aria-controls="recent-tracks" aria-selected="true">
+                                    <span class="time-label short">Recent</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="midterm-tab" data-bs-toggle="tab" data-bs-target="#midterm-tracks" type="button" role="tab" aria-controls="midterm-tracks" aria-selected="false">
+                                    <span class="time-label medium">Mid-term</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="longterm-tab" data-bs-toggle="tab" data-bs-target="#longterm-tracks" type="button" role="tab" aria-controls="longterm-tracks" aria-selected="false">
+                                    <span class="time-label long">Long-term</span>
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="tracksComparisonTabContent">
+                            <!-- Recent Tracks -->
+                            <div class="tab-pane fade show active" id="recent-tracks" role="tabpanel" aria-labelledby="recent-tab">
+                                <div class="tracks-container">
+                                    {% for track in short_term_tracks %}
+                                    <div class="track-card">
+                                        <div class="track-rank">{{ forloop.counter }}</div>
+                                        <div class="track-image">
+                                            {% if track.album.images %}
+                                            <img src="{{ track.album.images.0.url }}" alt="{{ track.name }}">
+                                            {% else %}
+                                            <div class="track-image-placeholder">
+                                                <i class="fas fa-music"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="track-details">
+                                            <div class="track-name">{{ track.name }}</div>
+                                            <div class="track-artist">{{ track.artists.0.name }}</div>
+                                        </div>
+                                        <div class="track-album">{{ track.album.name }}</div>
+                                        <div class="track-actions">
+                                            {% if track.preview_url %}
+                                            <button class="btn btn-play btn-sm" onclick="playPreview('{{ track.preview_url }}', 'play-icon-short-{{ forloop.counter }}')">
+                                                <i id="play-icon-short-{{ forloop.counter }}" class="fas fa-play"></i>
+                                            </button>
+                                            {% endif %}
+                                            <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-link btn-sm">
+                                                <i class="fab fa-spotify"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="alert alert-secondary">No recent track data available.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Mid-term Tracks -->
+                            <div class="tab-pane fade" id="midterm-tracks" role="tabpanel" aria-labelledby="midterm-tab">
+                                <div class="tracks-container">
+                                    {% for track in medium_term_tracks %}
+                                    <div class="track-card">
+                                        <div class="track-rank">{{ forloop.counter }}</div>
+                                        <div class="track-image">
+                                            {% if track.album.images %}
+                                            <img src="{{ track.album.images.0.url }}" alt="{{ track.name }}">
+                                            {% else %}
+                                            <div class="track-image-placeholder">
+                                                <i class="fas fa-music"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="track-details">
+                                            <div class="track-name">{{ track.name }}</div>
+                                            <div class="track-artist">{{ track.artists.0.name }}</div>
+                                        </div>
+                                        <div class="track-album">{{ track.album.name }}</div>
+                                        <div class="track-actions">
+                                            {% if track.preview_url %}
+                                            <button class="btn btn-play btn-sm" onclick="playPreview('{{ track.preview_url }}', 'play-icon-medium-{{ forloop.counter }}')">
+                                                <i id="play-icon-medium-{{ forloop.counter }}" class="fas fa-play"></i>
+                                            </button>
+                                            {% endif %}
+                                            <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-link btn-sm">
+                                                <i class="fab fa-spotify"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="alert alert-secondary">No mid-term track data available.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Long-term Tracks -->
+                            <div class="tab-pane fade" id="longterm-tracks" role="tabpanel" aria-labelledby="longterm-tab">
+                                <div class="tracks-container">
+                                    {% for track in long_term_tracks %}
+                                    <div class="track-card">
+                                        <div class="track-rank">{{ forloop.counter }}</div>
+                                        <div class="track-image">
+                                            {% if track.album.images %}
+                                            <img src="{{ track.album.images.0.url }}" alt="{{ track.name }}">
+                                            {% else %}
+                                            <div class="track-image-placeholder">
+                                                <i class="fas fa-music"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="track-details">
+                                            <div class="track-name">{{ track.name }}</div>
+                                            <div class="track-artist">{{ track.artists.0.name }}</div>
+                                        </div>
+                                        <div class="track-album">{{ track.album.name }}</div>
+                                        <div class="track-actions">
+                                            {% if track.preview_url %}
+                                            <button class="btn btn-play btn-sm" onclick="playPreview('{{ track.preview_url }}', 'play-icon-long-{{ forloop.counter }}')">
+                                                <i id="play-icon-long-{{ forloop.counter }}" class="fas fa-play"></i>
+                                            </button>
+                                            {% endif %}
+                                            <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-link btn-sm">
+                                                <i class="fab fa-spotify"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="alert alert-secondary">No long-term track data available.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Insights Section (Shown for both artists and tracks) -->
+                <div class="viz-card mt-4 animate-in" style="animation-delay: 0.7s;">
+                    <h2 class="section-heading">Time Comparison Insights</h2>
+                    
+                    <div class="insights-section">
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3 class="h5">Taste Evolution</h3>
+                                <p>
+                                    {% if similarity_short_long > 60 %}
+                                    Your current favorites align closely with your long-term listening habits, showing a <span class="fw-bold text-success">strong dedication</span> to your core musical preferences.
+                                    {% elif similarity_short_long > 30 %}
+                                    There's <span class="fw-bold text-primary">some overlap</span> between your current and long-term musical preferences, with a healthy balance of new discoveries and old favorites.
+                                    {% else %}
+                                    Your current music taste has <span class="fw-bold text-danger">evolved significantly</span> from your long-term preferences, showing a journey of musical exploration and changing tastes.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-clock-rotate-left"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3 class="h5">Recent Changes</h3>
+                                <p>
+                                    {% if similarity_short_medium > 70 %}
+                                    Your recent listening habits are <span class="fw-bold text-success">very similar</span> to your mid-term preferences, showing consistency in your music taste over the past 6 months.
+                                    {% elif similarity_short_medium > 40 %}
+                                    Your recent listening habits show <span class="fw-bold text-primary">moderate changes</span> compared to your mid-term preferences, indicating evolving musical interests.
+                                    {% else %}
+                                    Your recent listening habits are <span class="fw-bold text-danger">significantly different</span> from your mid-term preferences, suggesting you're exploring new artists and genres.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h3 class="h5">Genre Preferences</h3>
+                                <p>
+                                    {% if consistent_genres %}
+                                    Your most consistent genre is <span class="fw-bold text-success">{{ consistent_genres.0.0|title }}</span>, appearing across multiple time periods. This suggests a core element of your music taste.
+                                    {% else %}
+                                    We couldn't identify consistent genres across your time periods, suggesting a diverse and evolving music taste.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="mt-4 d-flex justify-content-end">
@@ -517,4 +1075,226 @@
         </div>
     </div>
 </div>
+
+<!-- Toast container for notifications -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050" id="toast-container"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Global audio player for track previews
+    let currentAudio = null;
+    let currentPlayingId = null;
+    
+    // DOM elements for tab toggling
+    const artistsCompareRadio = document.getElementById('artistsCompare');
+    const tracksCompareRadio = document.getElementById('tracksCompare');
+    const artistsSection = document.getElementById('artistsSection');
+    const tracksSection = document.getElementById('tracksSection');
+    
+    // Toggle between Artists and Tracks sections
+    if (artistsCompareRadio && tracksCompareRadio) {
+        artistsCompareRadio.addEventListener('change', function() {
+            if (this.checked) {
+                artistsSection.style.display = 'block';
+                tracksSection.style.display = 'none';
+            }
+        });
+        
+        tracksCompareRadio.addEventListener('change', function() {
+            if (this.checked) {
+                artistsSection.style.display = 'none';
+                tracksSection.style.display = 'block';
+            }
+        });
+    }
+    
+    // Function to play track previews with visual feedback
+    function playPreview(previewUrl, iconId) {
+        // Stop any currently playing audio
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            
+            // Reset previous play button icon if exists
+            if (currentPlayingId) {
+                document.getElementById(currentPlayingId).classList.remove('fa-pause');
+                document.getElementById(currentPlayingId).classList.add('fa-play');
+            }
+        }
+        
+        // If the same track was clicked, just stop it
+        if (currentPlayingId === iconId) {
+            currentAudio = null;
+            currentPlayingId = null;
+            return;
+        }
+        
+        // If there's no preview URL, show a toast
+        if (!previewUrl) {
+            showToast('Preview not available for this track');
+            return;
+        }
+        
+        // Create and play new audio
+        currentAudio = new Audio(previewUrl);
+        currentPlayingId = iconId;
+        
+        // Update UI to show playing state
+        const playIcon = document.getElementById(iconId);
+        playIcon.classList.remove('fa-play');
+        playIcon.classList.add('fa-pause');
+        
+        // Play the audio
+        currentAudio.play();
+        
+        // Reset when audio ends
+        currentAudio.addEventListener('ended', function() {
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play');
+            currentAudio = null;
+            currentPlayingId = null;
+        });
+        
+        // Handle errors if they occur
+        currentAudio.addEventListener('error', function() {
+            showToast('Error playing this preview. The preview might not be available.');
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play');
+            currentAudio = null;
+            currentPlayingId = null;
+        });
+    }
+    
+    // Function to show toast notifications
+    function showToast(message) {
+        const toastId = 'toast-' + Date.now();
+        const toastHtml = `
+            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-dark text-light">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong class="me-auto">Spotify Analytics</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body bg-dark text-light">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        // Add toast to container
+        document.getElementById('toast-container').innerHTML += toastHtml;
+        
+        // Initialize and show the toast
+        const toastElement = document.getElementById(toastId);
+        const bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.remove();
+        });
+    }
+    
+    // Initialize the artist comparison chart
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create the artist comparison chart
+        const ctx = document.getElementById('artistComparisonChart').getContext('2d');
+        
+        const artistChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ short_term_labels|safe }},
+                datasets: [{
+                    label: 'Recent (4 weeks)',
+                    data: {{ short_term_values|safe }},
+                    backgroundColor: 'rgba(29, 185, 84, 0.7)',
+                    borderColor: '#1DB954',
+                    borderWidth: 1
+                }, {
+                    label: 'Mid-term (6 months)',
+                    data: {{ medium_term_values|safe }},
+                    backgroundColor: 'rgba(74, 144, 226, 0.7)',
+                    borderColor: '#4A90E2',
+                    borderWidth: 1
+                }, {
+                    label: 'Long-term (years)',
+                    data: {{ long_term_values|safe }},
+                    backgroundColor: 'rgba(156, 39, 176, 0.7)',
+                    borderColor: '#9C27B0',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                family: "'Inter', sans-serif"
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(25, 20, 20, 0.9)',
+                        titleColor: 'rgba(255, 255, 255, 0.9)',
+                        bodyColor: 'rgba(255, 255, 255, 0.8)',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            family: "'Inter', sans-serif",
+                            weight: '600',
+                            size: 14
+                        },
+                        bodyFont: {
+                            family: "'Inter', sans-serif",
+                            size: 13
+                        },
+                        displayColors: true,
+                        boxWidth: 10,
+                        boxHeight: 10,
+                        boxPadding: 4
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                family: "'Inter', sans-serif"
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                family: "'Inter', sans-serif"
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -260,12 +260,20 @@ def time_comparison(request):
         top_artists_medium = sp.current_user_top_artists(limit=10, time_range='medium_term')
         top_artists_long = sp.current_user_top_artists(limit=10, time_range='long_term')
         
+        # Get the user's top tracks for different time ranges
+        top_tracks_short = sp.current_user_top_tracks(limit=10, time_range='short_term')
+        top_tracks_medium = sp.current_user_top_tracks(limit=10, time_range='medium_term')
+        top_tracks_long = sp.current_user_top_tracks(limit=10, time_range='long_term')
+        
+        # Get the user's profile for personalization
+        user_profile = sp.current_user()
+        
         # Prepare data for visualization
         short_term_data = {artist['name']: i for i, artist in enumerate(top_artists_short['items'], 1)}
         medium_term_data = {artist['name']: i for i, artist in enumerate(top_artists_medium['items'], 1)}
         long_term_data = {artist['name']: i for i, artist in enumerate(top_artists_long['items'], 1)}
         
-        # Calculate consistency score - how many artists are shared across time periods
+        # Calculate consistency score for artists - how many artists are shared across time periods
         all_artists = set()
         for artist in top_artists_short['items']:
             all_artists.add(artist['name'])
@@ -274,18 +282,43 @@ def time_comparison(request):
         for artist in top_artists_long['items']:
             all_artists.add(artist['name'])
             
-        short_term_set = {artist['name'] for artist in top_artists_short['items']}
-        medium_term_set = {artist['name'] for artist in top_artists_medium['items']}
-        long_term_set = {artist['name'] for artist in top_artists_long['items']}
+        short_term_artist_set = {artist['name'] for artist in top_artists_short['items']}
+        medium_term_artist_set = {artist['name'] for artist in top_artists_medium['items']}
+        long_term_artist_set = {artist['name'] for artist in top_artists_long['items']}
         
-        shared_short_medium = len(short_term_set.intersection(medium_term_set))
-        shared_short_long = len(short_term_set.intersection(long_term_set))
-        shared_medium_long = len(medium_term_set.intersection(long_term_set))
+        shared_short_medium_artists = len(short_term_artist_set.intersection(medium_term_artist_set))
+        shared_short_long_artists = len(short_term_artist_set.intersection(long_term_artist_set))
+        shared_medium_long_artists = len(medium_term_artist_set.intersection(long_term_artist_set))
         
-        avg_shared = (shared_short_medium + shared_short_long + shared_medium_long) / 3
-        consistency_score = int((avg_shared / 10) * 100) if top_artists_short['items'] else 0
+        # Calculate similarity percentages for artists
+        similarity_short_medium = int((shared_short_medium_artists / len(short_term_artist_set | medium_term_artist_set)) * 100) if short_term_artist_set and medium_term_artist_set else 0
+        similarity_short_long = int((shared_short_long_artists / len(short_term_artist_set | long_term_artist_set)) * 100) if short_term_artist_set and long_term_artist_set else 0
+        similarity_medium_long = int((shared_medium_long_artists / len(medium_term_artist_set | long_term_artist_set)) * 100) if medium_term_artist_set and long_term_artist_set else 0
         
-        # Prepare chart data
+        # Calculate consistency score for tracks
+        short_term_track_set = {track['name'] for track in top_tracks_short['items']}
+        medium_term_track_set = {track['name'] for track in top_tracks_medium['items']}
+        long_term_track_set = {track['name'] for track in top_tracks_long['items']}
+        
+        shared_short_medium_tracks = len(short_term_track_set.intersection(medium_term_track_set))
+        shared_short_long_tracks = len(short_term_track_set.intersection(long_term_track_set))
+        shared_medium_long_tracks = len(medium_term_track_set.intersection(long_term_track_set))
+        
+        # Calculate track similarity percentages
+        track_similarity_short_medium = int((shared_short_medium_tracks / len(short_term_track_set | medium_term_track_set)) * 100) if short_term_track_set and medium_term_track_set else 0
+        track_similarity_short_long = int((shared_short_long_tracks / len(short_term_track_set | long_term_track_set)) * 100) if short_term_track_set and long_term_track_set else 0
+        track_similarity_medium_long = int((shared_medium_long_tracks / len(medium_term_track_set | long_term_track_set)) * 100) if medium_term_track_set and long_term_track_set else 0
+        
+        # Get the most consistent genres across time periods
+        genre_counts = {}
+        for artist_list in [top_artists_short['items'], top_artists_medium['items'], top_artists_long['items']]:
+            for artist in artist_list:
+                for genre in artist.get('genres', []):
+                    genre_counts[genre] = genre_counts.get(genre, 0) + 1
+        
+        consistent_genres = sorted(genre_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        # Prepare chart data for artists
         short_term_labels = json.dumps([artist['name'] for artist in top_artists_short['items'][:5]])
         short_term_values = json.dumps([artist.get('popularity', 0) for artist in top_artists_short['items'][:5]])
         
@@ -297,17 +330,43 @@ def time_comparison(request):
         
         # Create the context
         context = {
-            'short_term': top_artists_short['items'],
-            'medium_term': top_artists_medium['items'],
-            'long_term': top_artists_long['items'],
-            'ranks': range(1, 11),  # 1-10 for ranking
-            'consistency_score': consistency_score,
+            # User data
+            'user_profile': user_profile,
+            
+            # Artist data
+            'short_term_artists': top_artists_short['items'],
+            'medium_term_artists': top_artists_medium['items'],
+            'long_term_artists': top_artists_long['items'],
+            
+            # Track data
+            'short_term_tracks': top_tracks_short['items'],
+            'medium_term_tracks': top_tracks_medium['items'],
+            'long_term_tracks': top_tracks_long['items'],
+            
+            # Range for looping
+            'top_artists_range': range(0, 10),  # 0-9 for indexing
+            'top_tracks_range': range(0, 10),  # 0-9 for indexing
+            
+            # Similarity scores
+            'similarity_short_medium': similarity_short_medium,
+            'similarity_short_long': similarity_short_long,
+            'similarity_medium_long': similarity_medium_long,
+            
+            # Track similarity scores
+            'track_similarity_short_medium': track_similarity_short_medium,
+            'track_similarity_short_long': track_similarity_short_long,
+            'track_similarity_medium_long': track_similarity_medium_long,
+            
+            # Chart data
             'short_term_labels': short_term_labels,
             'short_term_values': short_term_values,
             'medium_term_labels': medium_term_labels,
             'medium_term_values': medium_term_values,
             'long_term_labels': long_term_labels,
             'long_term_values': long_term_values,
+            
+            # Genre data
+            'consistent_genres': consistent_genres,
         }
         
         # Add trend analysis if there's enough data
