@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if user_profile.images and user_profile.images.0.url %}
+                        <img src="{{ user_profile.images.0.url }}" alt="Profile picture" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px; font-size: 50px;">
+                            {{ user_profile.display_name|first|upper }}
+                        </div>
+                    {% endif %}
+                    <h5 class="my-3">{{ user_profile.display_name }}</h5>
+                    <p class="text-muted mb-1">Spotify User</p>
+                    <p class="text-muted mb-4">{{ user_profile.country }}</p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <a href="{{ user_profile.external_urls.spotify }}" target="_blank" class="btn btn-primary">View on Spotify</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Username</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ user_profile.id }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Email</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ user_profile.email|default:"Not available" }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Followers</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ user_profile.followers.total }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Product</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ user_profile.product|title }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Artists -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Artists</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for artist in top_artists.items %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    {% if artist.images and artist.images.0.url %}
+                                        <img src="{{ artist.images.0.url }}" class="card-img-top" alt="{{ artist.name }}">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ artist.name }}</h5>
+                                        <p class="card-text small">
+                                            {% for genre in artist.genres|slice:":3" %}
+                                                <span class="badge bg-secondary me-1">{{ genre }}</span>
+                                            {% endfor %}
+                                        </p>
+                                        <a href="{{ artist.external_urls.spotify }}" class="btn btn-sm btn-outline-primary" target="_blank">Open in Spotify</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <p class="text-muted">No top artists found.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Tracks -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Tracks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for track in top_tracks.items %}
+                            <a href="{{ track.external_urls.spotify }}" class="list-group-item list-group-item-action" target="_blank">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        {% if track.album.images and track.album.images.2.url %}
+                                            <img src="{{ track.album.images.2.url }}" alt="{{ track.name }}" class="me-3" style="width: 40px; height: 40px;">
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ track.name }}</h6>
+                                            <p class="mb-0 text-muted small">
+                                                {% for artist in track.artists %}
+                                                    {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <small>{{ track.album.name }}</small>
+                                </div>
+                            </a>
+                        {% empty %}
+                            <div class="list-group-item">
+                                <p class="text-muted mb-0">No top tracks found.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Playlists -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Your Playlists</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for playlist in playlists.items %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    {% if playlist.images and playlist.images.0.url %}
+                                        <img src="{{ playlist.images.0.url }}" class="card-img-top" alt="{{ playlist.name }}">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ playlist.name }}</h5>
+                                        <p class="card-text small">{{ playlist.tracks.total }} tracks</p>
+                                        <a href="{{ playlist.external_urls.spotify }}" class="btn btn-sm btn-outline-primary" target="_blank">Open in Spotify</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <p class="text-muted">No playlists found.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

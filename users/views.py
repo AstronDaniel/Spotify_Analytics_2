@@ -231,6 +231,29 @@ def logout(request):
     return redirect('home')
 
 
+@login_required
+def delete_data(request):
+    """Handle user data deletion"""
+    if request.method == 'POST':
+        # Get the token info from the session
+        token_info = request.session.get('spotify_token_info')
+        
+        # Here you would implement the actual data deletion logic
+        # For example, delete user data from your database
+        # This is a placeholder for where you'd add that code
+        
+        # Clear the session data
+        request.session.pop('spotify_token_info', None)
+        request.session.pop('spotify_user_profile', None)
+        request.session.pop('spotify_auth_state', None)
+        
+        messages.success(request, "Your data has been successfully deleted.")
+        return redirect('home')
+    
+    # If not a POST request, redirect to settings
+    return redirect('settings')
+
+
 def debug_spotify(request):
     """
     Debug view to examine the Spotipy library structure.

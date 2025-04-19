@@ -1,111 +1,69 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
-{% block title %}Export Data - Spotify Analytics{% endblock %}
+{% block title %}Export Data - Coming Soon{% endblock %}
 
 {% block extra_css %}
 <style>
-    .visualization-container {
-        position: relative;
-        z-index: 1;
-    }
-    
-    .page-header {
-        position: relative;
-        margin-bottom: 3rem;
-        padding: 2.5rem 0;
-        overflow: hidden;
-        border-radius: 20px;
-    }
-    
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
+    .feature-card {
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(30, 30, 30, 0.5);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
         height: 100%;
-        background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(54, 162, 235, 0.15) 100%);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        z-index: -1;
+        overflow: hidden;
     }
     
-    .page-title {
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(29, 185, 84, 0.3);
+    }
+    
+    .feature-card .card-header {
+        background: linear-gradient(45deg, rgba(29, 185, 84, 0.15), rgba(30, 215, 96, 0.05));
+        border-bottom: 1px solid rgba(29, 185, 84, 0.2);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #1DB954, #1ED760);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 24px;
+        color: white;
+    }
+    
+    .coming-soon-banner {
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(54, 162, 235, 0.1));
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid rgba(29, 185, 84, 0.2);
+        margin-bottom: 2rem;
+    }
+    
+    .coming-soon-title {
         font-size: 2.5rem;
         font-weight: 800;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
         background: linear-gradient(90deg, #1DB954, #64D2AD);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         display: inline-block;
     }
     
-    .export-card {
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-    
-    .export-card:hover {
-        transform: translateY(-6px);
-    }
-    
-    .export-card .card-title {
-        color: var(--light);
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-    }
-    
-    .export-card .card-title i {
-        color: var(--primary);
-        margin-right: 0.5rem;
-    }
-    
-    .export-card .card-text {
-        color: var(--secondary);
-        font-size: 0.95rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .export-btn {
-        transition: all 0.25s ease;
+    .notification-form {
+        background: rgba(25, 25, 25, 0.5);
         border-radius: 12px;
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 2rem;
     }
     
-    .export-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .featured-export {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(29, 185, 84, 0.3);
-    }
-    
-    .featured-export::before {
-        content: 'Recommended';
-        position: absolute;
-        top: 10px;
-        right: -30px;
-        background: linear-gradient(135deg, #1DB954, #1aa34a);
-        color: white;
-        padding: 5px 30px;
-        font-size: 0.75rem;
-        transform: rotate(45deg);
-        box-shadow: 0 2px 10px rgba(29, 185, 84, 0.3);
-    }
-    
-    .alert-info {
-        background-color: rgba(13, 202, 240, 0.15);
-        border-color: rgba(13, 202, 240, 0.3);
-    }
-    
-    /* Format badges styling */
     .format-badge {
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -113,505 +71,141 @@
         padding: 0.4rem 1rem;
         font-size: 0.85rem;
         font-weight: 600;
-        color: var(--light);
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    
-    .format-badge:hover {
-        background: rgba(29, 185, 84, 0.15);
-        border-color: rgba(29, 185, 84, 0.3);
-        color: var(--primary);
-        transform: translateY(-2px);
-    }
-    
-    .format-badge i {
-        margin-right: 0.4rem;
-        font-size: 0.9rem;
-    }
-    
-    .export-formats {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1.5rem;
-    }
-    
-    /* Toast notification */
-    .toast-notification {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        box-shadow: var(--glass-shadow);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        opacity: 0;
-        transform: translateY(100px);
-        transition: all 0.3s ease;
-        z-index: 1050;
-    }
-    
-    .toast-notification.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    .toast-notification i {
-        font-size: 1.5rem;
-        color: var(--primary);
+        color: rgba(255, 255, 255, 0.7);
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
     }
 </style>
 {% endblock %}
 
-{% block content %}<div class="visualization-container">
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header text-center">
-            <div class="container py-4">
-                <h1 class="page-title">Export Your Spotify Data</h1>
-                <p class="lead text-light opacity-75">Download your listening data in various formats for personal analysis or sharing</p>
+{% block content %}
+<div class="container py-5">
+    <!-- Coming Soon Banner -->
+    <div class="coming-soon-banner text-center">
+        <h1 class="coming-soon-title">Data Export Coming Soon!</h1>
+        <p class="lead text-light opacity-75">We're working hard to bring you powerful data export capabilities</p>
+        <div class="mt-3">
+            <div class="badge bg-light text-dark rounded-pill px-3 py-2 fw-normal">
+                <i class="fas fa-hourglass-half me-2 text-primary"></i>Estimated release: May 2025
             </div>
         </div>
-        
-        <!-- Information Alert -->
-        <div class="alert alert-info glass-card mb-4">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-info-circle me-3 fs-4"></i>
-                <div>
-                    <h5 class="alert-heading mb-1">About Data Exports</h5>
-                    <p class="mb-0">All exports include your personalized data from Spotify. The exports are generated in real-time based on your current listening patterns.</p>
+    </div>
+    
+    <!-- Feature Cards -->
+    <div class="row mt-5">
+        <!-- Top Tracks Export -->
+        <div class="col-md-4 mb-4">
+            <div class="feature-card">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 text-white"><i class="fas fa-music me-2"></i>Top Tracks</h5>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Export Cards Section -->
-        <div class="row mt-5">
-            <!-- Top Tracks Export -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card glass-card export-card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-music"></i>Top Tracks</h5>
-                        <p class="card-text">Export your top tracks across different time ranges with details like popularity and release date.</p>
-                        <div class="export-formats">
-                            <a href="{% url 'export_data' %}?type=top_tracks&format=csv" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>
-                            <a href="{% url 'export_data' %}?type=top_tracks&format=json" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-code"></i>JSON
-                            </a>
-                            <a href="{% url 'export_data' %}?type=top_tracks&format=pdf" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-pdf"></i>PDF
-                            </a>
-                        </div>
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Audio Features Export -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card glass-card export-card featured-export">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-sliders-h"></i>Audio Features</h5>
-                        <p class="card-text">Export detailed audio features of your top tracks including danceability, energy, and tempo.</p>
-                        <div class="export-formats">
-                            <a href="{% url 'export_data' %}?type=audio_features&format=csv" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>
-                            <a href="{% url 'export_data' %}?type=audio_features&format=json" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-code"></i>JSON
-                            </a>
-                            <a href="{% url 'export_data' %}?type=audio_features&format=pdf" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-pdf"></i>PDF
-                            </a>
-                        </div>
+                    <h6 class="mb-3 text-white">Track Your Favorites</h6>
+                    <p class="text-muted">Export your most played tracks across different time ranges with detailed listening statistics and audio features.</p>
+                    
+                    <div class="mt-4">
+                        <p class="small text-light opacity-75">Available Formats:</p>
+                        <span class="format-badge"><i class="fas fa-file-csv me-1"></i>CSV</span>
+                        <span class="format-badge"><i class="fas fa-file-code me-1"></i>JSON</span>
+                        <span class="format-badge"><i class="fas fa-file-pdf me-1"></i>PDF</span>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Genre Distribution Export -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card glass-card export-card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-chart-pie"></i>Genre Distribution</h5>
-                        <p class="card-text">Export your genre distribution data showing your most listened to music genres.</p>
-                        <div class="export-formats">
-                            <a href="{% url 'export_data' %}?type=genre_distribution&format=csv" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>
-                            <a href="{% url 'export_data' %}?type=genre_distribution&format=json" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-code"></i>JSON
-                            </a>
-                            <a href="{% url 'export_data' %}?type=genre_distribution&format=pdf" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-pdf"></i>PDF
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Listening History Export -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card glass-card export-card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-history"></i>Recently Played</h5>
-                        <p class="card-text">Export your recently played tracks with timestamps and playback context.</p>
-                        <div class="export-formats">
-                            <a href="{% url 'export_data' %}?type=recently_played&format=csv" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>                            <a href="{% url 'export_data' %}?type=recently_played&format=json" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-code"></i>JSON
-                            </a>
-                            <a href="{% url 'export_data' %}?type=recently_played&format=pdf" class="format-badge text-decoration-none">
-                                <i class="fas fa-file-pdf"></i>PDF
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Top Artists Export -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card glass-card export-card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-user-alt"></i>Top Artists</h5>
-                        <p class="card-text">Export your top artists with popularity metrics, genres and follower counts.</p>
-                        <div class="export-formats
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{% endblock %}</script>    });        });            });                }, 3000);                    toastNotification.classList.remove('show');                setTimeout(() => {                // Hide toast after 3 seconds                                toastNotification.classList.add('show');                                        `Export of ${cardTitle} in ${format.toUpperCase()} format will be available soon!`;                document.querySelector('.toast-message').textContent =                 // Show toast notification                                const cardTitle = this.closest('.card-body').querySelector('.card-title').textContent.trim();                const format = this.getAttribute('data-format');            badge.addEventListener('click', function() {        formatBadges.forEach(badge => {                const toastNotification = document.querySelector('.toast-notification');        const formatBadges = document.querySelectorAll('.format-badge');    document.addEventListener('DOMContentLoaded', function() {<script>{% block extra_js %}{% endblock %}</div>    </div>        <div class="toast-message">This export feature will be available in the next update!</div>        <div class="toast-title fw-bold">Coming Soon</div>    <div>    <i class="fas fa-info-circle"></i><div class="toast-notification"><!-- Toast Notification --></div>    </div>        </div>            </div>                </div>                    </div>                        </div>                            <span class="format-badge" data-format="html"><i class="fas fa-file-code"></i> HTML</span>                            <span class="format-badge" data-format="json"><i class="fas fa-code"></i> JSON</span>                            <span class="format-badge" data-format="zip"><i class="fas fa-file-archive"></i> ZIP</span>                        <div class="export-formats">                        <div class="formats-label mt-3 mb-1 small text-muted">Export formats:</div>                        <p class="card-text">Export your entire listening history, preferences, and trends in a comprehensive package with visualizations.</p>                        </h3>                            <i class="fas fa-database"></i> Complete Data                        <h3 class="card-title">                    <div class="card-body p-4">                    <div class="recommended-ribbon">Recommended</div>                <div class="glass-card export-card featured-export">            <div class="col-md-6 col-lg-4 mb-4">            <!-- Complete Data Export Card - Featured -->                        </div>                </div>                    </div>                        </div>                            <span class="format-badge" data-format="pdf"><i class="fas fa-file-pdf"></i> PDF</span>                            <span class="format-badge" data-format="json"><i class="fas fa-code"></i> JSON</span>                            <span class="format-badge" data-format="csv"><i class="fas fa-table"></i> CSV</span>                        <div class="export-formats">                        <div class="formats-label mt-3 mb-1 small text-muted">Export formats:</div>                        <p class="card-text">Download your most listened artists with popularity scores, genres, and follower statistics.</p>                        </h3>                            <i class="fas fa-user-music"></i> Top Artists                        <h3 class="card-title">                    <div class="card-body p-4">                <div class="glass-card export-card">            <div class="col-md-6 col-lg-4 mb-4">            <!-- Top Artists Export Card -->                        </div>                </div>                    </div>                        </div>                            <span class="format-badge" data-format="ics"><i class="fas fa-calendar"></i> ICS</span>                            <span class="format-badge" data-format="json"><i class="fas fa-code"></i> JSON</span>                            <span class="format-badge" data-format="csv"><i class="fas fa-table"></i> CSV</span>                        <div class="export-formats">                        <div class="formats-label mt-3 mb-1 small text-muted">Export formats:</div>                        <p class="card-text">Export your listening history with timestamps, durations, and associated playlists or albums.</p>                        </h3>                            <i class="fas fa-history"></i> Recently Played                        <h3 class="card-title">                    <div class="card-body p-4">                <div class="glass-card export-card">            <div class="col-md-6 col-lg-4 mb-4">            <!-- Recently Played Export Card -->                        </div>                </div>                    </div>                        </div>                            <span class="format-badge" data-format="svg"><i class="fas fa-chart-pie"></i> SVG</span>                            <span class="format-badge" data-format="json"><i class="fas fa-code"></i> JSON</span>                            <span class="format-badge" data-format="csv"><i class="fas fa-table"></i> CSV</span>                        <div class="export-formats">                        <div class="formats-label mt-3 mb-1 small text-muted">Export formats:</div>                        <p class="card-text">Get a breakdown of your listening habits by genre with percentages and changes over time.</p>                        </h3>                            <i class="fas fa-compact-disc"></i> Genre Distribution                        <h3 class="card-title">                    <div class="card-body p-4">                <div class="glass-card export-card">            <div class="col-md-6 col-lg-4 mb-4">            <!-- Genre Distribution Export Card -->                        </div>                </div>                    </div>                        </div>                            <span class="format-badge" data-format="xlsx"><i class="fas fa-file-excel"></i> XLSX</span>                            <span class="format-badge" data-format="json"><i class="fas fa-code"></i> JSON</span>                            <span class="format-badge" data-format="csv"><i class="fas fa-table"></i> CSV</span>                        <div class="export-formats">                        <div class="formats-label mt-3 mb-1 small text-muted">Export formats:</div>                        <p class="card-text">Download detailed audio analysis of your music including danceability, energy, tempo, and valence metrics.</p>                        </h3>                            <i class="fas fa-sliders-h"></i> Audio Features                        <h3 class="card-title">                    <div class="card-body p-4">                <div class="glass-card export-card">            <div class="col-md-6 col-lg-4 mb-4">            <!-- Audio Features Export Card -->                        </div>                </div>                    </div>                        </div>                            <span class="format-badge" data-format="pdf"><i class="fas fa-file-pdf"></i> PDF</span>                            <span class="format-badge" data-format="json"><i class="fas fa-code"></i> JSON</span>                            <span class="format-badge" data-format="csv"><i class="fas fa-table"></i> CSV</span>                        <div class="export-formats">                        <div class="formats-label mt-3 mb-1 small text-muted">Export formats:</div>                        <p class="card-text">Export your most played tracks over different time periods with play counts and detailed audio features.</p>                        </h3>                            <i class="fas fa-music"></i> Top Tracks                        <h3 class="card-title">                    <div class="card-body p-4">                <div class="glass-card export-card">            <div class="col-md-6 col-lg-4 mb-4">            <!-- Top Tracks Export Card -->        <div class="row">    <div class="container">        </div>        </div>            </div>                </div>                    <i class="fas fa-file-export fa-4x text-light opacity-25"></i>                <div class="col-lg-4 text-end">                </div>                    <p class="lead text-light">Download your listening data in various formats for further analysis</p>                    <h1 class="page-title">Export Your Data</h1>                <div class="col-lg-8">            <div class="row align-items-center">        <div class="container">    <div class="page-header"><div class="visualization-container animate-in">{% block content %}{% endblock %}</style>    }        color: var(--primary);        font-size: 1.5rem;    .toast-notification i {        }        opacity: 1;        transform: translateY(0);    .toast-notification.show {        }        transition: all 0.3s ease;        opacity: 0;        transform: translateY(100px);        gap: 1rem;        align-items: center;        display: flex;        z-index: 1050;        padding: 1rem 1.5rem;        border-radius: 12px;        -webkit-backdrop-filter: blur(12px);        backdrop-filter: blur(12px);        box-shadow: var(--glass-shadow);        border: 1px solid var(--glass-border);        background: var(--glass-bg);        right: 20px;        bottom: 20px;        position: fixed;    .toast-notification {    /* Toast Notification */        }        background: linear-gradient(135deg, rgba(29, 185, 84, 0.05), rgba(100, 210, 173, 0.05));        border-color: rgba(29, 185, 84, 0.3);    .featured-export {    /* Featured Export Card */        }        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);        transform: rotate(45deg);        padding: 0.25rem 2.5rem;        font-weight: 600;        font-size: 0.8rem;        color: white;        background: linear-gradient(135deg, #1DB954, #64D2AD);        right: -35px;        top: 10px;        position: absolute;    .recommended-ribbon {    /* Featured Export Ribbon */        }        font-size: 0.9rem;        margin-right: 0.4rem;    .format-badge i {        }        transform: translateY(-2px);        color: var(--primary);        border-color: rgba(29, 185, 84, 0.3);        background: rgba(29, 185, 84, 0.15);    .format-badge:hover {        }        transition: all 0.2s ease;        cursor: pointer;        color: var(--light);        font-weight: 600;        font-size: 0.85rem;        padding: 0.4rem 1rem;        border-radius: 20px;        border: 1px solid rgba(255, 255, 255, 0.1);        background: rgba(255, 255, 255, 0.08);    .format-badge {        }        margin-top: 1.5rem;        gap: 0.5rem;        display: flex;    .export-formats {        }        font-size: 1.5rem;        color: var(--primary);        margin-right: 0.75rem;    .export-card .card-title i {        }        align-items: center;        display: flex;        margin-bottom: 0.5rem;        font-weight: 700;        font-size: 1.35rem;    .export-card .card-title {        }        border-color: rgba(29, 185, 84, 0.3);        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);        transform: translateY(-8px);    .export-card:hover {        }        overflow: hidden;        position: relative;        transition: all 0.35s ease;        height: 100%;    .export-card {    /* Export Cards */        }        margin-bottom: 0.5rem;        display: inline-block;        -webkit-text-fill-color: transparent;        -webkit-background-clip: text;        background: linear-gradient(135deg, #1DB954, #64D2AD);        font-weight: 700;    .page-title {        }        -webkit-backdrop-filter: blur(12px);        backdrop-filter: blur(12px);        border: 1px solid var(--glass-border);        margin-bottom: 2.5rem;        padding: 2rem;        border-radius: 16px;        background: var(--glass-bg);    .page-header {    /* Page Header */<style>{% block extra_css %}{% block title %}Export Your Data - Spotify Analytics{% endblock %}                            <a href="{% url 'export_data' %}?type=top_artists&format=csv" class="btn btn-sm btn-outline-light export-btn">CSV</a>
-                            <a href="{% url 'export_data' %}?type=top_artists&format=json" class="btn btn-sm btn-outline-light export-btn">JSON</a>
-                            <a href="{% url 'export_data' %}?type=top_artists&format=pdf" class="btn btn-sm btn-outline-light export-btn">PDF</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Complete Data Export -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card glass-card export-card featured-export">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-file-archive"></i>Complete Data</h5>
-                        <p class="card-text">Export all your Spotify data in a single package for comprehensive analysis.</p>
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'export_data' %}?type=complete&format=csv" class="btn btn-sm btn-outline-light export-btn">CSV</a>
-                            <a href="{% url 'export_data' %}?type=complete&format=json" class="btn btn-sm btn-outline-light export-btn">JSON</a>
-                            <a href="{% url 'export_data' %}?type=complete&format=zip" class="btn btn-sm btn-primary export-btn">ZIP</a>
-                        </div>
+                    
+                    <div class="mt-4">
+                        <p class="small text-light opacity-75">Export Data Includes:</p>
+                        <ul class="text-muted small">
+                            <li>Track names and artists</li>
+                            <li>Play counts and popularity metrics</li>
+                            <li>Album information and release dates</li>
+                            <li>Detailed audio feature analysis</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Info Alert -->
-        <div class="alert alert-info mt-4 glass-card">
-            <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i>About Data Exports</h5>
-            <p class="mb-0">Data exports include only the information that Spotify provides through their API. The export feature is currently in beta, and some formats may not be available for all data types.</p>
+        <!-- Audio Features Export -->
+        <div class="col-md-4 mb-4">
+            <div class="feature-card">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 text-white"><i class="fas fa-sliders-h me-2"></i>Audio Features</h5>
+                </div>
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <h6 class="mb-3 text-white">Analyze Your Music</h6>
+                    <p class="text-muted">Download detailed audio analysis of your music including danceability, energy, tempo, and more.</p>
+                    
+                    <div class="mt-4">
+                        <p class="small text-light opacity-75">Available Formats:</p>
+                        <span class="format-badge"><i class="fas fa-file-csv me-1"></i>CSV</span>
+                        <span class="format-badge"><i class="fas fa-file-code me-1"></i>JSON</span>
+                        <span class="format-badge"><i class="fas fa-file-excel me-1"></i>XLSX</span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <p class="small text-light opacity-75">Export Data Includes:</p>
+                        <ul class="text-muted small">
+                            <li>Danceability and energy scores</li>
+                            <li>Tempo, key, and mode analysis</li>
+                            <li>Valence and acousticness metrics</li>
+                            <li>Instrumentalness and speechiness scores</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Genre Distribution Export -->
+        <div class="col-md-4 mb-4">
+            <div class="feature-card">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 text-white"><i class="fas fa-chart-pie me-2"></i>Genre Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-compact-disc"></i>
+                    </div>
+                    <h6 class="mb-3 text-white">Discover Your Taste</h6>
+                    <p class="text-muted">Get a breakdown of your listening habits by genre with detailed statistics and trends over time.</p>
+                    
+                    <div class="mt-4">
+                        <p class="small text-light opacity-75">Available Formats:</p>
+                        <span class="format-badge"><i class="fas fa-file-csv me-1"></i>CSV</span>
+                        <span class="format-badge"><i class="fas fa-file-code me-1"></i>JSON</span>
+                        <span class="format-badge"><i class="fas fa-chart-pie me-1"></i>SVG</span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <p class="small text-light opacity-75">Export Data Includes:</p>
+                        <ul class="text-muted small">
+                            <li>Genre distribution percentages</li>
+                            <li>Top artists for each genre</li>
+                            <li>Listening trends over time</li>
+                            <li>Genre mood analysis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Form -->
+    <div class="notification-form text-center mt-5">
+        <h4 class="text-white mb-3">Get Notified When Export Features Launch</h4>
+        <p class="text-muted mb-4">Be the first to know when our export features are ready to use.</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <input type="email" class="form-control bg-dark text-light border-dark" placeholder="Your email address">
+                    <button class="btn btn-primary" type="button">Notify Me</button>
+                </div>
+                <div class="form-text text-muted mt-2">We'll only email you about the export feature launch. No spam.</div>
+            </div>
         </div>
     </div>
 </div>
@@ -619,49 +213,30 @@
 
 {% block extra_js %}
 <script>
-    // This will be used to handle export requests in the future
-    $(document).ready(function() {
-        // Add a loading indicator when export links are clicked
-        $('a[href^="{% url "export_data" %}"]').click(function(e) {
-            e.preventDefault();
-            
-            // Get the type and format from the URL
-            const url = new URL(this.href);
-            const type = url.searchParams.get('type');
-            const format = url.searchParams.get('format');
-            
-            // Show a loading toast notification
-            const toast = `
-                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
-                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header bg-dark text-light">
-                            <i class="fas fa-spinner fa-spin me-2"></i>
-                            <strong class="me-auto">Preparing Export</strong>
-                            <small>Just now</small>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-                        </div>
-                        <div class="toast-body bg-dark text-light">
-                            Preparing your ${type} data in ${format.toUpperCase()} format. This feature is coming soon!
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Append the toast to the body
-            $('body').append(toast);
-            
-            // Remove the toast after 3 seconds
-            setTimeout(function() {
-                $('.toast').toast('hide');
-                setTimeout(function() {
-                    $('.toast').parent().remove();
-                }, 500);
-            }, 3000);
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle notification form submission
+        const notifyButton = document.querySelector('.notification-form button');
+        const emailInput = document.querySelector('.notification-form input');
         
-        // Add animation to export cards
-        $('.export-card').each(function(index) {
-            $(this).css('animation-delay', `${index * 0.1}s`);
+        if (notifyButton) {
+            notifyButton.addEventListener('click', function() {
+                if (emailInput.value.trim()) {
+                    // This would connect to a real backend in production
+                    alert('Thanks! We\'ll notify you when the export features launch.');
+                    emailInput.value = '';
+                } else {
+                    alert('Please enter a valid email address.');
+                }
+            });
+        }
+        
+        // Add subtle animation to feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
         });
     });
 </script>
