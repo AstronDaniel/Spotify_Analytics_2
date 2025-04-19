@@ -8,6 +8,8 @@ users\migrations
 users\__pycache__
 spotify_debug.log
 .pyc
+*.pdb
+*.pyc
 __pycache__
 *.sqlite3
 *.db
