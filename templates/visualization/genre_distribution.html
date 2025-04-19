@@ -341,7 +341,7 @@
     }
     
     /* Songs Section */
-    .songs-container {
+    .songs-container, .artists-container {
         position: relative;
         max-height: 450px;
         overflow-y: auto;
@@ -349,20 +349,20 @@
         scrollbar-width: thin;
     }
     
-    .songs-container::-webkit-scrollbar {
+    .songs-container::-webkit-scrollbar, .artists-container::-webkit-scrollbar {
         width: 5px;
     }
     
-    .songs-container::-webkit-scrollbar-track {
+    .songs-container::-webkit-scrollbar-track, .artists-container::-webkit-scrollbar-track {
         background: rgba(255, 255, 255, 0.05);
     }
     
-    .songs-container::-webkit-scrollbar-thumb {
+    .songs-container::-webkit-scrollbar-thumb, .artists-container::-webkit-scrollbar-thumb {
         background: rgba(29, 185, 84, 0.3);
         border-radius: 5px;
     }
     
-    .songs-container::-webkit-scrollbar-thumb:hover {
+    .songs-container::-webkit-scrollbar-thumb:hover, .artists-container::-webkit-scrollbar-thumb:hover {
         background: rgba(29, 185, 84, 0.5);
     }
     
@@ -442,6 +442,131 @@
         background: var(--spotify-green);
         color: white;
         transform: scale(1.1);
+    }
+    
+    /* Artists Container */
+    .artists-container {
+        position: relative;
+        max-height: 450px;
+        overflow-y: auto;
+        padding-right: 10px;
+        scrollbar-width: thin;
+    }
+    
+    .artists-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .artists-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .artists-container::-webkit-scrollbar-thumb {
+        background: rgba(29, 185, 84, 0.3);
+        border-radius: 5px;
+    }
+    
+    .artists-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(29, 185, 84, 0.5);
+    }
+    
+    /* Artist Grid Layout */
+    .artist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+    
+    /* Artist Card */
+    .artist-card {
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        height: 100%;
+    }
+    
+    .artist-card:hover {
+        transform: translateY(-5px);
+        background: rgba(29, 185, 84, 0.08);
+        border-color: rgba(29, 185, 84, 0.15);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .artist-img, .artist-img-placeholder {
+        width: 100%;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+    
+    .artist-card:hover .artist-img {
+        transform: scale(1.05);
+    }
+    
+    .artist-details {
+        padding: 0.75rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .artist-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .artist-popularity {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    
+    .popularity-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #1DB954, #64D2AD);
+        border-radius: 2px;
+    }
+    
+    .artist-action {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(29, 185, 84, 0.15);
+        border-radius: 50%;
+        color: var(--spotify-green);
+        margin-left: auto;
+        transition: all 0.3s ease;
+    }
+    
+    .artist-action:hover {
+        background: var(--spotify-green);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    /* Responsive adjustments for artist grid */
+    @media (max-width: 768px) {
+        .artist-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .artist-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
     }
     
     /* Placeholder States */
@@ -932,8 +1057,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle genre item clicks to show songs by genre
     const genreItems = document.querySelectorAll('.genre-item');
     const initialMessage = document.getElementById('initialMessage');
-    
-    genreItems.forEach(item => {
+      genreItems.forEach(item => {
         item.addEventListener('click', function() {
             // Remove active state from all genre items
             genreItems.forEach(g => g.classList.remove('active'));
@@ -944,12 +1068,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get the genre name
             const genre = this.getAttribute('data-genre');
             
-            // Hide all song lists and initial message
+            // Hide all song lists and initial messages
             document.querySelectorAll('.genre-songs').forEach(el => el.classList.add('d-none'));
+            document.querySelectorAll('.genre-artists').forEach(el => el.classList.add('d-none'));
             initialMessage.classList.add('d-none');
+            const initialArtistsMessage = document.getElementById('initialArtistsMessage');
+            if (initialArtistsMessage) {
+                initialArtistsMessage.classList.add('d-none');
+            }
+            
+            // Format the genre slug consistently for both songs and artists
+            const genreSlug = genre.replace(/\s+/g, '-');
             
             // Show the songs for the selected genre
-            const songsContainer = document.getElementById(`songs-${genre.replace(/\s+/g, '-')}`);
+            const songsContainer = document.getElementById(`songs-${genreSlug}`);
             if (songsContainer) {
                 songsContainer.classList.remove('d-none');
                 
@@ -968,6 +1100,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 // If no container found (due to slug conversion issues), show a message
                 initialMessage.classList.remove('d-none');
                 initialMessage.innerHTML = `<p>No songs found for the genre "${genre}".</p>`;
+            }
+            
+            // Show the artists for the selected genre
+            const artistsContainer = document.getElementById(`artists-${genreSlug}`);
+            if (artistsContainer) {
+                artistsContainer.classList.remove('d-none');
+                
+                // Apply a subtle entrance animation to each artist card
+                const artistCards = artistsContainer.querySelectorAll('.artist-card');
+                artistCards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(15px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.4s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50 * index);
+                });
+            } else if (initialArtistsMessage) {
+                // If no container found, show a message
+                initialArtistsMessage.classList.remove('d-none');
+                initialArtistsMessage.innerHTML = `<p>No artists found for the genre "${genre}".</p>`;
             }
         });
     });
