@@ -501,7 +501,7 @@
                             </div>
                             <h3 class="h5 mb-0">Listening Activity</h3>
                         </div>
-                        <h4 class="listening-stats mb-3">{{ recently_played.items|length }}</h4>
+                        <h4 class="listening-stats mb-3">{{ recently_played.items|length|default:"0" }}</h4>
                         <p class="text-secondary mb-0">Songs played recently</p>
                     </div>
                 </div>
@@ -514,9 +514,11 @@
                             <h3 class="h5 mb-0">Top Genres</h3>
                         </div>
                         <div class="mb-3">
-                            <span class="badge badge-genre me-1">Pop</span>
-                            <span class="badge badge-genre me-1">Rock</span>
-                            <span class="badge badge-genre">Hip Hop</span>
+                            {% for genre in top_genres %}
+                                <span class="badge badge-genre me-1">{{ genre }}</span>
+                            {% empty %}
+                                <span class="badge badge-genre me-1">No genres found</span>
+                            {% endfor %}
                         </div>
                         <p class="text-secondary mb-0">Based on your listening history</p>
                     </div>

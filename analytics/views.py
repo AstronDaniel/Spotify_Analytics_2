@@ -49,12 +49,26 @@ def dashboard(request):
     # Get the user's top tracks
     top_tracks = sp.current_user_top_tracks(limit=10, time_range='medium_term')
     
+    # Extract top genres from the user's top artists
+    genre_counts = {}
+    for artist in top_artists['items']:
+        for genre in artist['genres']:
+            if genre in genre_counts:
+                genre_counts[genre] += 1
+            else:
+                genre_counts[genre] = 1
+    
+    # Sort genres by count and get the top 3
+    top_genres = sorted(genre_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+    top_genres = [genre.title() for genre, count in top_genres] if top_genres else ['No genres found']
+    
     # Create the context
     context = {
         'user_profile': user_profile,
         'recently_played': recently_played,
         'top_artists': top_artists,
         'top_tracks': top_tracks,
+        'top_genres': top_genres,
     }
     
     return render(request, 'analytics/dashboard.html', context)
