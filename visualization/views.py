@@ -41,21 +41,51 @@ def genre_distribution(request):
     # Get the user's top artists
     top_artists = sp.current_user_top_artists(limit=50, time_range='medium_term')
     
+    # Get the user's top tracks to associate with genres
+    top_tracks = sp.current_user_top_tracks(limit=50, time_range='medium_term')
+    
     # Extract genres from top artists
     genres = {}
+    artist_by_genre = {}  # To track which artists belong to each genre
+    
     for artist in top_artists['items']:
         for genre in artist['genres']:
             if genre in genres:
                 genres[genre] += 1
+                artist_by_genre[genre].append(artist)
             else:
                 genres[genre] = 1
+                artist_by_genre[genre] = [artist]
     
     # Sort genres by count (descending)
     sorted_genres = sorted(genres.items(), key=lambda x: x[1], reverse=True)
     
     # Get the top 10 genres
     top_genres = sorted_genres[:10]
-      # Create the context with properly formatted data for Chart.js
+    
+    # Create song list by genre
+    songs_by_genre = {}
+    
+    # Associate tracks with genres through their artists
+    for track in top_tracks['items']:
+        track_artist_id = track['artists'][0]['id']
+        
+        # Find which genres this track's artist belongs to
+        track_genres = []
+        for genre, artists in artist_by_genre.items():
+            if any(artist['id'] == track_artist_id for artist in artists):
+                track_genres.append(genre)
+        
+        # Add track to all matching genres
+        for genre in track_genres:
+            if genre in songs_by_genre:
+                # Don't add duplicates
+                if not any(t['id'] == track['id'] for t in songs_by_genre[genre]):
+                    songs_by_genre[genre].append(track)
+            else:
+                songs_by_genre[genre] = [track]
+    
+    # Create the context with properly formatted data for Chart.js
     genres_labels = [genre for genre, count in top_genres]
     genres_data = [count for genre, count in top_genres]
     
@@ -65,9 +95,37 @@ def genre_distribution(request):
         'data': genres_data
     }
     
+    # Create genre insights data
+    if top_genres:
+        primary_genre = top_genres[0][0]
+        total_artists = sum(count for genre, count in top_genres)
+        primary_genre_percentage = round((top_genres[0][1] / total_artists) * 100)
+        
+        # Calculate diversity score
+        genre_diversity = len(genres)
+        if genre_diversity > 20:
+            diversity_level = "extremely diverse"
+        elif genre_diversity > 15:
+            diversity_level = "very diverse"
+        elif genre_diversity > 10:
+            diversity_level = "diverse"
+        elif genre_diversity > 5:
+            diversity_level = "somewhat diverse"
+        else:
+            diversity_level = "focused"
+    else:
+        primary_genre = ""
+        primary_genre_percentage = 0
+        diversity_level = "unknown"
+    
     context = {
         'top_genres': top_genres,
         'genres_data': json.dumps(chart_data),
+        'songs_by_genre': songs_by_genre,
+        'primary_genre': primary_genre,
+        'primary_genre_percentage': primary_genre_percentage,
+        'diversity_level': diversity_level,
+        'genre_count': len(genres),
     }
     
     return render(request, 'visualization/genre_distribution.html', context)

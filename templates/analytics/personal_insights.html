@@ -42,8 +42,7 @@
         -webkit-text-fill-color: transparent;
         display: inline-block;
     }
-    
-    .insight-card {
+      .insight-card {
         height: 100%;
         transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
         border-radius: 12px;
@@ -53,6 +52,8 @@
         border: 1px solid var(--card-border);
         overflow: hidden;
         position: relative;
+        max-width: 100%;
+        word-wrap: break-word;
     }
     
     .insight-card:hover {
@@ -78,6 +79,7 @@
         pointer-events: none;
         z-index: -1;
     }
+    
     
     .insight-card .card-title {
         font-size: 1.35rem;
@@ -195,11 +197,30 @@
         color: var(--primary);
         font-weight: 600;
     }
-    
-    /* Responsive adjustments */
+      /* Responsive adjustments */
     @media (max-width: 768px) {
         .page-title {
             font-size: 2rem;
+        }
+        
+        .insight-card .card-title {
+            font-size: 1.2rem;
+        }
+        
+        .insight-card {
+            margin-bottom: 1rem;
+        }
+        
+        .time-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .time-selector .btn {
+            margin: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
         }
     }
 </style>
